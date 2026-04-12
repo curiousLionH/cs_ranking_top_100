@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US News 2026 — CS Graduate Rankings Top 100</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080b12;
+  --surface: #0f1422;
+  --surface2: #151c30;
+  --border: #1d2540;
+  --text: #dde2f0;
+  --muted: #58638a;
+  --accent: #e8c84a;
+  --t1: #f0455a;
+  --t2: #ff8c3a;
+  --t3: #3dd68c;
+  --t4: #38b4f5;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
+
+header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 60px;
+  background: rgba(15,20,34,0.97); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+}
+.eyebrow { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .15em; color: var(--accent); text-transform: uppercase; }
+.htitle { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -.02em; }
+.htitle span { color: var(--accent); }
+
+.legend { display: flex; gap: 5px; }
+.leg {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border); cursor: pointer;
+  transition: all .18s; user-select: none;
+}
+.leg.on { background: var(--surface2); }
+.leg.off { opacity: .3; }
+.leg-dot { width: 9px; height: 9px; border-radius: 50%; }
+.leg-txt { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700; }
+
+.layout { display: flex; height: 100vh; padding-top: 60px; }
+
+/* Sidebar */
+.sidebar {
+  width: 280px; flex-shrink: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden; z-index: 100;
+}
+.srch { padding: 11px 13px; border-bottom: 1px solid var(--border); }
+.srch input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 7px; color: var(--text); font-family: 'DM Sans', sans-serif;
+  font-size: 12px; padding: 7px 11px; outline: none; transition: border-color .2s;
+}
+.srch input::placeholder { color: var(--muted); }
+.srch input:focus { border-color: var(--accent); }
+
+.list { overflow-y: auto; flex: 1; }
+.list::-webkit-scrollbar { width: 3px; }
+.list::-webkit-scrollbar-thumb { background: var(--border); }
+
+.thdr {
+  padding: 8px 13px 4px;
+  font-family: 'Space Mono', monospace; font-size: 9px;
+  font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 6px;
+  position: sticky; top: 0; background: var(--surface); z-index: 5;
+}
+.thdr-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+.scard {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 13px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background .12s;
+  border-left: 3px solid transparent;
+}
+.scard:hover, .scard.sel { background: var(--surface2); }
+.scard.t1 { border-left-color: var(--t1); }
+.scard.t2 { border-left-color: var(--t2); }
+.scard.t3 { border-left-color: var(--t3); }
+.scard.t4 { border-left-color: var(--t4); }
+.rnk {
+  font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sname { font-size: 11.5px; font-weight: 500; line-height: 1.3; }
+.scity { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.scard-links { display: flex; gap: 6px; margin-top: 5px; }
+.scard-link {
+  font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+  padding: 2px 7px; border-radius: 4px; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 3px;
+  transition: opacity .15s;
+}
+.scard-link:hover { opacity: 0.75; }
+.scard-link-map { background: #1a73e822; color: #1a73e8; border: 1px solid #1a73e844; }
+.scard-link-web { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+
+/* Map */
+#map { flex: 1; }
+
+/* Custom Info Window */
+.iw-wrap { padding: 4px 2px; min-width: 240px; max-width: 280px; font-family: 'DM Sans', sans-serif; }
+.iw-rank { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; margin-bottom: 4px; }
+.iw-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; line-height: 1.25; margin-bottom: 4px; color: #111; }
+.iw-city { font-size: 11px; color: #666; display: flex; align-items: center; gap: 4px; }
+.iw-divider { border: none; border-top: 1px solid #e8eaf0; margin: 10px 0 8px; }
+.iw-links { display: flex; gap: 7px; }
+.iw-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 11px; border-radius: 7px; font-size: 11px; font-weight: 600;
+  text-decoration: none; font-family: 'DM Sans', sans-serif;
+  transition: opacity .15s; white-space: nowrap; flex: 1; justify-content: center;
+}
+.iw-btn:hover { opacity: 0.82; }
+.iw-btn-map { background: #1a73e8; color: #fff; }
+.iw-btn-web { background: #f1f3f4; color: #333; border: 1px solid #dadce0; }
+.iw-badge { margin-top: 0; display: inline-block; padding: 2px 9px; border-radius: 20px; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; }
+
+/* Stats pill */
+.spill {
+  position: fixed; bottom: 22px; left: calc(280px + 50%); transform: translateX(-50%);
+  background: rgba(15,20,34,.92); backdrop-filter: blur(10px);
+  border: 1px solid var(--border); border-radius: 30px;
+  display: flex; z-index: 100; overflow: hidden;
+}
+.sp { padding: 7px 18px; text-align: center; border-right: 1px solid var(--border); }
+.sp:last-child { border-right: none; }
+.sp-n { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; color: var(--accent); }
+.sp-l { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="eyebrow">U.S. News &amp; World Report · 2026 Edition</div>
+    <div class="htitle">CS Graduate Rankings <span>Top 100</span></div>
+  </div>
+  <div class="legend" id="legend">
+    <div class="leg on" data-tier="1"><div class="leg-dot" style="background:var(--t1)"></div><span class="leg-txt" style="color:var(--t1)">Top 10</span></div>
+    <div class="leg on" data-tier="2"><div class="leg-dot" style="background:var(--t2)"></div><span class="leg-txt" style="color:var(--t2)">#11–30</span></div>
+    <div class="leg on" data-tier="3"><div class="leg-dot" style="background:var(--t3)"></div><span class="leg-txt" style="color:var(--t3)">#31–50</span></div>
+    <div class="leg on" data-tier="4"><div class="leg-dot" style="background:var(--t4)"></div><span class="leg-txt" style="color:var(--t4)">#51–100</span></div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="srch"><input id="searchBox" type="text" placeholder="Search schools or cities…"/></div>
+    <div class="list" id="listEl"></div>
+  </aside>
+  <div id="map"></div>
+</div>
+
+<div class="spill">
+  <div class="sp"><div class="sp-n">100</div><div class="sp-l">Schools</div></div>
+  <div class="sp"><div class="sp-n">35+</div><div class="sp-l">States</div></div>
+  <div class="sp"><div class="sp-n">2026</div><div class="sp-l">Edition</div></div>
+</div>
+
+<script>
+const TC  = { 1:'#f0455a', 2:'#ff8c3a', 3:'#3dd68c', 4:'#38b4f5' };
+const TL  = { 1:'Top 10',  2:'#11–30',  3:'#31–50',  4:'#51–100' };
+const TTX = { 1:'#fff',    2:'#fff',    3:'#080b12', 4:'#080b12' };
+const tierVis = { 1:true, 2:true, 3:true, 4:true };
+
+const SCHOOLS = [
+  // Tier 1 — Top 10
+  {r:1,  n:"Carnegie Mellon University",            c:"Pittsburgh, PA",       lat:40.4432, lng:-79.9428, t:1, w:"https://www.cs.cmu.edu"},
+  {r:1,  n:"MIT",                                   c:"Cambridge, MA",        lat:42.3601, lng:-71.0942, t:1, w:"https://www.csail.mit.edu"},
+  {r:1,  n:"Stanford University",                   c:"Stanford, CA",         lat:37.4275, lng:-122.1697,t:1, w:"https://cs.stanford.edu"},
+  {r:4,  n:"UC Berkeley",                           c:"Berkeley, CA",         lat:37.8724, lng:-122.2595,t:1, w:"https://eecs.berkeley.edu"},
+  {r:5,  n:"Univ. of Illinois Urbana-Champaign",    c:"Champaign, IL",        lat:40.1020, lng:-88.2272, t:1, w:"https://cs.illinois.edu"},
+  {r:6,  n:"Cornell University",                    c:"Ithaca, NY",           lat:42.4534, lng:-76.4735, t:1, w:"https://www.cs.cornell.edu"},
+  {r:6,  n:"University of Washington",              c:"Seattle, WA",          lat:47.6553, lng:-122.3035,t:1, w:"https://www.cs.washington.edu"},
+  {r:8,  n:"Georgia Tech",                          c:"Atlanta, GA",          lat:33.7756, lng:-84.3963, t:1, w:"https://www.cc.gatech.edu"},
+  {r:9,  n:"Princeton University",                  c:"Princeton, NJ",        lat:40.3431, lng:-74.6514, t:1, w:"https://www.cs.princeton.edu"},
+  {r:10, n:"UT Austin",                             c:"Austin, TX",           lat:30.2849, lng:-97.7341, t:1, w:"https://www.cs.utexas.edu"},
+  // Tier 2 — #11–30
+  {r:11, n:"Columbia University",                   c:"New York, NY",         lat:40.8075, lng:-73.9626, t:2, w:"https://www.cs.columbia.edu"},
+  {r:11, n:"UC San Diego",                          c:"La Jolla, CA",         lat:32.8801, lng:-117.2340,t:2, w:"https://cse.ucsd.edu"},
+  {r:13, n:"Univ. of Michigan–Ann Arbor",           c:"Ann Arbor, MI",        lat:42.2780, lng:-83.7382, t:2, w:"https://cse.engin.umich.edu"},
+  {r:14, n:"Yale University",                       c:"New Haven, CT",        lat:41.3163, lng:-72.9223, t:2, w:"https://cpsc.yale.edu"},
+  {r:15, n:"Purdue University",                     c:"West Lafayette, IN",   lat:40.4259, lng:-86.9081, t:2, w:"https://www.cs.purdue.edu"},
+  {r:15, n:"Univ. of Maryland–College Park",        c:"College Park, MD",     lat:38.9869, lng:-76.9426, t:2, w:"https://www.cs.umd.edu"},
+  {r:17, n:"Harvard University",                    c:"Cambridge, MA",        lat:42.3770, lng:-71.1167, t:2, w:"https://www.seas.harvard.edu/computer-science"},
+  {r:17, n:"UCLA",                                  c:"Los Angeles, CA",      lat:34.0689, lng:-118.4452,t:2, w:"https://www.cs.ucla.edu"},
+  {r:19, n:"Univ. of Wisconsin–Madison",            c:"Madison, WI",          lat:43.0766, lng:-89.4125, t:2, w:"https://www.cs.wisc.edu"},
+  {r:20, n:"Duke University",                       c:"Durham, NC",           lat:36.0014, lng:-78.9382, t:2, w:"https://cs.duke.edu"},
+  {r:20, n:"UMass Amherst",                         c:"Amherst, MA",          lat:42.3868, lng:-72.5301, t:2, w:"https://www.cics.umass.edu"},
+  {r:20, n:"Univ. of Pennsylvania",                 c:"Philadelphia, PA",     lat:39.9522, lng:-75.1932, t:2, w:"https://www.cis.upenn.edu"},
+  {r:23, n:"Johns Hopkins University",              c:"Baltimore, MD",        lat:39.3299, lng:-76.6205, t:2, w:"https://www.cs.jhu.edu"},
+  {r:23, n:"New York University",                   c:"New York, NY",         lat:40.7295, lng:-73.9965, t:2, w:"https://cs.nyu.edu"},
+  {r:25, n:"Brown University",                      c:"Providence, RI",       lat:41.8268, lng:-71.4025, t:2, w:"https://cs.brown.edu"},
+  {r:25, n:"Rice University",                       c:"Houston, TX",          lat:29.7174, lng:-95.4018, t:2, w:"https://cs.rice.edu"},
+  {r:25, n:"Rutgers Univ.–New Brunswick",           c:"Piscataway, NJ",       lat:40.5008, lng:-74.4474, t:2, w:"https://www.cs.rutgers.edu"},
+  {r:25, n:"UC Santa Barbara",                      c:"Santa Barbara, CA",    lat:34.4140, lng:-119.8489,t:2, w:"https://cs.ucsb.edu"},
+  {r:29, n:"Boston University",                     c:"Boston, MA",           lat:42.3505, lng:-71.1054, t:2, w:"https://www.bu.edu/cs"},
+  {r:29, n:"Dartmouth College",                     c:"Hanover, NH",          lat:43.7044, lng:-72.2887, t:2, w:"https://web.cs.dartmouth.edu"},
+  // Tier 3 — #31–50
+  {r:31, n:"Arizona State University",              c:"Tempe, AZ",            lat:33.4255, lng:-111.9400,t:3, w:"https://scai.engineering.asu.edu"},
+  {r:31, n:"NC State University",                   c:"Raleigh, NC",          lat:35.7848, lng:-78.6821, t:3, w:"https://www.csc.ncsu.edu"},
+  {r:31, n:"Stony Brook Univ. (SUNY)",              c:"Stony Brook, NY",      lat:40.9148, lng:-73.1236, t:3, w:"https://www.cs.stonybrook.edu"},
+  {r:34, n:"Virginia Tech",                         c:"Blacksburg, VA",       lat:37.2284, lng:-80.4234, t:3, w:"https://cs.vt.edu"},
+  {r:34, n:"Univ. of Minnesota–Twin Cities",        c:"Minneapolis, MN",      lat:44.9740, lng:-93.2277, t:3, w:"https://cse.umn.edu"},
+  {r:36, n:"UC Irvine",                             c:"Irvine, CA",           lat:33.6405, lng:-117.8443,t:3, w:"https://www.ics.uci.edu"},
+  {r:37, n:"Ohio State University",                 c:"Columbus, OH",         lat:40.0076, lng:-83.0300, t:3, w:"https://cse.osu.edu"},
+  {r:38, n:"Univ. of Colorado Boulder",             c:"Boulder, CO",          lat:40.0076, lng:-105.2659,t:3, w:"https://www.colorado.edu/cs"},
+  {r:39, n:"Michigan State University",             c:"East Lansing, MI",     lat:42.7018, lng:-84.4822, t:3, w:"https://www.cse.msu.edu"},
+  {r:39, n:"Penn State University",                 c:"University Park, PA",  lat:40.7934, lng:-77.8600, t:3, w:"https://www.cse.psu.edu"},
+  {r:41, n:"Northeastern University",               c:"Boston, MA",           lat:42.3398, lng:-71.0892, t:3, w:"https://www.khoury.northeastern.edu"},
+  {r:41, n:"UC Davis",                              c:"Davis, CA",            lat:38.5382, lng:-121.7617,t:3, w:"https://cs.ucdavis.edu"},
+  {r:43, n:"Indiana University",                    c:"Bloomington, IN",      lat:39.1682, lng:-86.5230, t:3, w:"https://luddy.indiana.edu"},
+  {r:43, n:"Univ. of Arizona",                      c:"Tucson, AZ",           lat:32.2319, lng:-110.9501,t:3, w:"https://www.cs.arizona.edu"},
+  {r:45, n:"Univ. of Florida",                      c:"Gainesville, FL",      lat:29.6516, lng:-82.3248, t:3, w:"https://www.cise.ufl.edu"},
+  {r:46, n:"Harvey Mudd College",                   c:"Claremont, CA",        lat:34.1066, lng:-117.7109,t:3, w:"https://www.hmc.edu/cs"},
+  {r:47, n:"Univ. of Virginia",                     c:"Charlottesville, VA",  lat:38.0336, lng:-78.5080, t:3, w:"https://engineering.virginia.edu/departments/computer-science"},
+  {r:47, n:"Vanderbilt University",                 c:"Nashville, TN",        lat:36.1447, lng:-86.8027, t:3, w:"https://www.cs.vanderbilt.edu"},
+  {r:49, n:"Worcester Polytechnic Inst.",           c:"Worcester, MA",        lat:42.2746, lng:-71.8063, t:3, w:"https://www.wpi.edu/academics/departments/computer-science"},
+  {r:50, n:"Univ. of Rochester",                    c:"Rochester, NY",        lat:43.1285, lng:-77.6278, t:3, w:"https://www.cs.rochester.edu"},
+  // Tier 4 — #51–100
+  {r:51, n:"Univ. of Pittsburgh",                   c:"Pittsburgh, PA",       lat:40.4444, lng:-79.9608, t:4, w:"https://www.cs.pitt.edu"},
+  {r:51, n:"Tufts University",                      c:"Medford, MA",          lat:42.4075, lng:-71.1190, t:4, w:"https://engineering.tufts.edu/cs"},
+  {r:53, n:"Univ. of Notre Dame",                   c:"Notre Dame, IN",       lat:41.6996, lng:-86.2353, t:4, w:"https://cse.nd.edu"},
+  {r:53, n:"Univ. of Utah",                         c:"Salt Lake City, UT",   lat:40.7649, lng:-111.8421,t:4, w:"https://www.cs.utah.edu"},
+  {r:55, n:"Washington Univ. in St. Louis",         c:"St. Louis, MO",        lat:38.6488, lng:-90.3108, t:4, w:"https://cse.wustl.edu"},
+  {r:55, n:"Rensselaer Polytechnic Inst.",          c:"Troy, NY",             lat:42.7298, lng:-73.6791, t:4, w:"https://www.cs.rpi.edu"},
+  {r:57, n:"UC Riverside",                          c:"Riverside, CA",        lat:33.9537, lng:-117.3961,t:4, w:"https://www1.cs.ucr.edu"},
+  {r:57, n:"Iowa State University",                 c:"Ames, IA",             lat:42.0267, lng:-93.6465, t:4, w:"https://www.cs.iastate.edu"},
+  {r:59, n:"UC Santa Cruz",                         c:"Santa Cruz, CA",       lat:36.9916, lng:-122.0583,t:4, w:"https://engineering.ucsc.edu/departments/computer-science-and-engineering"},
+  {r:59, n:"Emory University",                      c:"Atlanta, GA",          lat:33.7915, lng:-84.3239, t:4, w:"https://cs.emory.edu"},
+  {r:61, n:"SUNY–Albany",                           c:"Albany, NY",           lat:42.6882, lng:-73.8271, t:4, w:"https://www.cs.albany.edu"},
+  {r:62, n:"Univ. of Illinois–Chicago",             c:"Chicago, IL",          lat:41.8720, lng:-87.6480, t:4, w:"https://cs.uic.edu"},
+  {r:62, n:"Texas A&M University",                  c:"College Station, TX",  lat:30.6187, lng:-96.3365, t:4, w:"https://engineering.tamu.edu/cse"},
+  {r:64, n:"Case Western Reserve Univ.",            c:"Cleveland, OH",        lat:41.5042, lng:-81.6091, t:4, w:"https://engineering.case.edu/computer-and-data-sciences"},
+  {r:64, n:"George Mason University",               c:"Fairfax, VA",          lat:38.8316, lng:-77.3072, t:4, w:"https://cs.gmu.edu"},
+  {r:66, n:"Oregon State University",               c:"Corvallis, OR",        lat:44.5638, lng:-123.2794,t:4, w:"https://eecs.oregonstate.edu"},
+  {r:66, n:"Univ. of Tennessee",                    c:"Knoxville, TN",        lat:35.9544, lng:-83.9259, t:4, w:"https://www.eecs.utk.edu"},
+  {r:68, n:"Univ. of Delaware",                     c:"Newark, DE",           lat:39.6785, lng:-75.7516, t:4, w:"https://www.cis.udel.edu"},
+  {r:69, n:"William & Mary",                        c:"Williamsburg, VA",     lat:37.2707, lng:-76.7075, t:4, w:"https://www.wm.edu/as/computerscience"},
+  {r:69, n:"Florida State University",              c:"Tallahassee, FL",      lat:30.4418, lng:-84.2985, t:4, w:"https://www.cs.fsu.edu"},
+  {r:71, n:"Drexel University",                     c:"Philadelphia, PA",     lat:39.9564, lng:-75.1897, t:4, w:"https://drexel.edu/cci/academics/computer-science-department"},
+  {r:72, n:"George Washington Univ.",               c:"Washington, DC",       lat:38.8997, lng:-77.0489, t:4, w:"https://cs.gwu.edu"},
+  {r:73, n:"Univ. of Houston",                      c:"Houston, TX",          lat:29.7199, lng:-95.3422, t:4, w:"https://www.uh.edu/nsm/computer-science"},
+  {r:74, n:"Univ. of Kansas",                       c:"Lawrence, KS",         lat:38.9543, lng:-95.2558, t:4, w:"https://eecs.ku.edu"},
+  {r:75, n:"Clemson University",                    c:"Clemson, SC",          lat:34.6834, lng:-82.8374, t:4, w:"https://www.clemson.edu/cecas/departments/computing"},
+  {r:76, n:"Colorado State University",             c:"Fort Collins, CO",     lat:40.5731, lng:-105.0849,t:4, w:"https://www.cs.colostate.edu"},
+  {r:77, n:"Univ. of Iowa",                         c:"Iowa City, IA",        lat:41.6611, lng:-91.5302, t:4, w:"https://cs.uiowa.edu"},
+  {r:78, n:"Syracuse University",                   c:"Syracuse, NY",         lat:43.0366, lng:-76.1378, t:4, w:"https://ecs.syracuse.edu/academics/electrical-engineering-and-computer-science"},
+  {r:79, n:"Lehigh University",                     c:"Bethlehem, PA",        lat:40.6065, lng:-75.3776, t:4, w:"https://engineering.lehigh.edu/cse"},
+  {r:80, n:"Univ. of Nebraska–Lincoln",             c:"Lincoln, NE",          lat:40.8202, lng:-96.7005, t:4, w:"https://cse.unl.edu"},
+  {r:81, n:"Florida International Univ.",           c:"Miami, FL",            lat:25.7587, lng:-80.3728, t:4, w:"https://www.cis.fiu.edu"},
+  {r:82, n:"Univ. of South Carolina",               c:"Columbia, SC",         lat:33.9966, lng:-81.0299, t:4, w:"https://www.cse.sc.edu"},
+  {r:83, n:"Washington State University",           c:"Pullman, WA",          lat:46.7298, lng:-117.1817,t:4, w:"https://school.eecs.wsu.edu"},
+  {r:84, n:"Illinois Inst. of Technology",          c:"Chicago, IL",          lat:41.8355, lng:-87.6270, t:4, w:"https://www.iit.edu/computer-science"},
+  {r:85, n:"UMBC",                                  c:"Baltimore, MD",        lat:39.2561, lng:-76.7143, t:4, w:"https://www.csee.umbc.edu"},
+  {r:86, n:"Wayne State University",                c:"Detroit, MI",          lat:42.3573, lng:-83.0714, t:4, w:"https://engineering.wayne.edu/computer-science"},
+  {r:87, n:"Univ. of Central Florida",              c:"Orlando, FL",          lat:28.6024, lng:-81.2001, t:4, w:"https://www.cs.ucf.edu"},
+  {r:88, n:"Stevens Inst. of Technology",           c:"Hoboken, NJ",          lat:40.7440, lng:-74.0242, t:4, w:"https://www.stevens.edu/school-engineering-science/departments/computer-science"},
+  {r:89, n:"Missouri S&T",                          c:"Rolla, MO",            lat:37.9519, lng:-91.7785, t:4, w:"https://cs.mst.edu"},
+  {r:90, n:"Univ. of Kentucky",                     c:"Lexington, KY",        lat:38.0306, lng:-84.4985, t:4, w:"https://www.engr.uky.edu/research-faculty/departments/computer-science"},
+  {r:91, n:"Univ. of South Florida",                c:"Tampa, FL",            lat:28.0587, lng:-82.4139, t:4, w:"https://www.usf.edu/engineering/cse"},
+  {r:92, n:"CUNY Graduate Center",                  c:"New York, NY",         lat:40.7484, lng:-73.9842, t:4, w:"https://www.gc.cuny.edu/computer-science"},
+  {r:93, n:"Univ. of Alabama",                      c:"Tuscaloosa, AL",       lat:33.2098, lng:-87.5692, t:4, w:"https://cs.ua.edu"},
+  {r:94, n:"Binghamton Univ. (SUNY)",               c:"Binghamton, NY",       lat:42.0898, lng:-75.9679, t:4, w:"https://www.binghamton.edu/computer-science"},
+  {r:95, n:"Oklahoma State University",             c:"Stillwater, OK",       lat:36.1269, lng:-97.0737, t:4, w:"https://cs.okstate.edu"},
+  {r:96, n:"New Mexico State University",           c:"Las Cruces, NM",       lat:32.2801, lng:-106.7497,t:4, w:"https://cs.nmsu.edu"},
+  {r:97, n:"Univ. of Arkansas",                     c:"Fayetteville, AR",     lat:36.0679, lng:-94.1741, t:4, w:"https://engineering.uark.edu/computer-science-computer-engineering"},
+  {r:98, n:"Univ. of Connecticut",                  c:"Storrs, CT",           lat:41.8077, lng:-72.2535, t:4, w:"https://www.cse.uconn.edu"},
+  {r:99, n:"Univ. of Mississippi",                  c:"Oxford, MS",           lat:34.3654, lng:-89.5378, t:4, w:"https://engineering.olemiss.edu/eecs"},
+  {r:100,n:"Portland State University",             c:"Portland, OR",         lat:45.5118, lng:-122.6844,t:4, w:"https://www.pdx.edu/computer-science"},
+];
+
+let map, markers = [], openInfoWindow = null;
+
+// ── Google Maps init ──
+window.initMap = function() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: { lat: 39.5, lng: -98.0 },
+    zoom: 4,
+    mapTypeId: 'roadmap',
+    styles: [
+      { elementType:'geometry', stylers:[{color:'#1a2235'}] },
+      { elementType:'labels.text.fill', stylers:[{color:'#8a9bc0'}] },
+      { elementType:'labels.text.stroke', stylers:[{color:'#0d111e'}] },
+      { featureType:'administrative', elementType:'geometry', stylers:[{color:'#2a3555'}] },
+      { featureType:'administrative.country', elementType:'labels.text.fill', stylers:[{color:'#9aa8d0'}] },
+      { featureType:'administrative.land_parcel', stylers:[{visibility:'off'}] },
+      { featureType:'administrative.locality', elementType:'labels.text.fill', stylers:[{color:'#bbc8e8'}] },
+      { featureType:'administrative.province', elementType:'labels.text.fill', stylers:[{color:'#a0b0d8'}] },
+      { featureType:'poi', stylers:[{visibility:'off'}] },
+      { featureType:'poi.park', elementType:'geometry', stylers:[{color:'#162030'}] },
+      { featureType:'road', elementType:'geometry', stylers:[{color:'#253050'}] },
+      { featureType:'road', elementType:'geometry.stroke', stylers:[{color:'#1a2440'}] },
+      { featureType:'road.highway', elementType:'geometry', stylers:[{color:'#2e3f6e'}] },
+      { featureType:'road.highway', elementType:'labels.text.fill', stylers:[{color:'#6a7faa'}] },
+      { featureType:'transit', stylers:[{visibility:'off'}] },
+      { featureType:'water', elementType:'geometry', stylers:[{color:'#0a0f1e'}] },
+      { featureType:'water', elementType:'labels.text.fill', stylers:[{color:'#3d5580'}] },
+    ],
+    disableDefaultUI: false,
+    zoomControl: true,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: true,
+  });
+
+  // Draw markers
+  SCHOOLS.forEach(s => {
+    const color = TC[s.t].replace('#','');
+    const size  = s.t === 1 ? 36 : s.t === 2 ? 30 : s.t === 3 ? 26 : 22;
+    const fs    = s.t === 1 ? 11 : s.t === 2 ? 9 : 8;
+    const tc    = TTX[s.t] === '#fff' ? 'ffffff' : '080b12';
+
+    // Use Google Charts API for pin icons (no external dependency)
+    const svgMarker = {
+      path: google.maps.SymbolPath.CIRCLE,
+      fillColor: TC[s.t],
+      fillOpacity: 1,
+      strokeColor: 'rgba(255,255,255,0.3)',
+      strokeWeight: 1.5,
+      scale: size / 2,
+    };
+
+    const marker = new google.maps.Marker({
+      position: { lat: s.lat, lng: s.lng },
+      map: map,
+      icon: svgMarker,
+      title: s.n,
+      label: {
+        text: String(s.r),
+        color: TTX[s.t],
+        fontFamily: "'Space Mono', monospace",
+        fontSize: `${fs}px`,
+        fontWeight: '700',
+      },
+      zIndex: (5 - s.t) * 100,
+    });
+
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.n + ' ' + s.c)}`;
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+        <div class="iw-wrap">
+          <div class="iw-rank" style="color:${TC[s.t]}">#${s.r} · ${TL[s.t]}</div>
+          <div class="iw-name">${s.n}</div>
+          <div class="iw-city">📍 ${s.c}</div>
+          <hr class="iw-divider"/>
+          <div class="iw-links">
+            <a class="iw-btn iw-btn-map" href="${mapsUrl}" target="_blank" rel="noopener">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              Google Maps
+            </a>
+            <a class="iw-btn iw-btn-web" href="${s.w}" target="_blank" rel="noopener">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+              Official Site
+            </a>
+          </div>
+        </div>`,
+      maxWidth: 300,
+    });
+
+    marker.addListener('click', () => {
+      if (openInfoWindow) openInfoWindow.close();
+      infoWindow.open(map, marker);
+      openInfoWindow = infoWindow;
+    });
+
+    markers.push({ marker, infoWindow, school: s });
+  });
+
+  // Close info window on map click
+  map.addListener('click', () => {
+    if (openInfoWindow) { openInfoWindow.close(); openInfoWindow = null; }
+  });
+};
+
+// ── Sidebar ──
+function renderList(q = '') {
+  const el = document.getElementById('listEl');
+  el.innerHTML = '';
+  [1,2,3,4].forEach(t => {
+    if (!tierVis[t]) return;
+    const rows = SCHOOLS.filter(s =>
+      s.t === t &&
+      (q === '' || s.n.toLowerCase().includes(q.toLowerCase()) || s.c.toLowerCase().includes(q.toLowerCase()))
+    );
+    if (!rows.length) return;
+    const h = document.createElement('div');
+    h.className = 'thdr';
+    h.innerHTML = `<div class="thdr-dot" style="background:${TC[t]}"></div>${TL[t]}`;
+    el.appendChild(h);
+    rows.forEach(s => {
+      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.n + ' ' + s.c)}`;
+      const d = document.createElement('div');
+      d.className = `scard t${s.t}`;
+      d.innerHTML = `
+        <div class="rnk" style="background:${TC[s.t]}22;color:${TC[s.t]}">#${s.r}</div>
+        <div style="flex:1;min-width:0">
+          <div class="sname">${s.n}</div>
+          <div class="scity">${s.c}</div>
+          <div class="scard-links">
+            <a class="scard-link scard-link-map" href="${mapsUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+              📍 Maps
+            </a>
+            <a class="scard-link scard-link-web" href="${s.w}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+              🌐 Website
+            </a>
+          </div>
+        </div>`;
+      d.addEventListener('click', () => {
+        document.querySelectorAll('.scard').forEach(x => x.classList.remove('sel'));
+        d.classList.add('sel');
+        const entry = markers.find(m => m.school === s);
+        if (entry && map) {
+          map.panTo({ lat: s.lat, lng: s.lng });
+          map.setZoom(10);
+          if (openInfoWindow) openInfoWindow.close();
+          entry.infoWindow.open(map, entry.marker);
+          openInfoWindow = entry.infoWindow;
+        }
+      });
+      el.appendChild(d);
+    });
+  });
+}
+renderList();
+document.getElementById('searchBox').addEventListener('input', e => renderList(e.target.value));
+
+// ── Legend ──
+document.querySelectorAll('.leg').forEach(el => {
+  el.addEventListener('click', () => {
+    const t = +el.dataset.tier;
+    tierVis[t] = !tierVis[t];
+    el.classList.toggle('on', tierVis[t]);
+    el.classList.toggle('off', !tierVis[t]);
+    markers.filter(m => m.school.t === t).forEach(m => m.marker.setMap(tierVis[t] ? map : null));
+    renderList(document.getElementById('searchBox').value);
+  });
+});
+</script>
+
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8AsjvG1dzVBfSpb7vlRIiNWTeQRI2xyU&callback=initMap&language=en">
+</script>
+</body>
+</html>
