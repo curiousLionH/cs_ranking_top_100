@@ -6,457 +6,408 @@
 <title>US News 2026 — CS Graduate Rankings Top 100</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#080b12; --surface:#0f1422; --surface2:#151c30; --border:#1d2540;
-  --text:#dde2f0; --muted:#58638a; --accent:#e8c84a;
-  --t1:#f0455a; --t2:#ff8c3a; --t3:#3dd68c; --t4:#38b4f5;
-  --HH: 56px;   /* header height */
-  --SB: 290px;  /* sidebar width */
-  --TB: 56px;   /* tab bar height */
-}
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html, body { width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; }
+/* ── RESET ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { width:100%; height:100%; overflow:hidden; font-family:'DM Sans',sans-serif; background:#080b12; color:#dde2f0; }
 
-/* ═══════════════════════════════════════
-   HEADER  — fixed top strip
-═══════════════════════════════════════ */
-#header {
-  position:fixed; inset:0 0 auto 0; height:var(--HH); z-index:500;
+/* ── TOKENS ── */
+:root {
+  --bg:#080b12; --sur:#0f1422; --sur2:#151c30; --bdr:#1d2540;
+  --txt:#dde2f0; --mut:#58638a; --acc:#e8c84a;
+  --t1:#f0455a; --t2:#ff8c3a; --t3:#3dd68c; --t4:#38b4f5;
+}
+
+/* ════════════════════════════════════════════
+   HEADER  z=900
+════════════════════════════════════════════ */
+#hdr {
+  position:fixed; top:0; left:0; right:0; height:56px; z-index:900;
   background:rgba(8,11,18,.97); backdrop-filter:blur(18px);
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid var(--bdr);
   display:flex; align-items:center; justify-content:space-between; padding:0 18px; gap:12px;
 }
 .brand { display:flex; flex-direction:column; gap:1px; }
-.eyebrow { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.14em; color:var(--accent); text-transform:uppercase; }
-.htitle { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; letter-spacing:-.02em; }
-.htitle span { color:var(--accent); }
+.ey { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.14em; color:var(--acc); text-transform:uppercase; }
+.ht { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; letter-spacing:-.02em; }
+.ht span { color:var(--acc); }
 
-/* desktop tier legend */
-.leg-row { display:flex; gap:4px; }
-.leg {
-  display:flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px;
-  border:1px solid var(--border); cursor:pointer; transition:all .18s; user-select:none;
-}
-.leg.on  { background:var(--surface2); }
+/* desktop legend */
+#legRow { display:flex; gap:4px; }
+.leg { display:flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; border:1px solid var(--bdr); cursor:pointer; transition:all .18s; user-select:none; }
+.leg.on  { background:var(--sur2); }
 .leg.off { opacity:.28; }
-.leg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-.leg-txt { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; }
+.ld { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.lt { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; }
 
-/* mobile filter button (hidden on desktop) */
-#filterBtn {
-  display:none; align-items:center; gap:5px; padding:6px 12px; border-radius:20px;
-  border:1px solid var(--border); background:var(--surface2); cursor:pointer;
-  color:var(--text); font-family:'Space Mono',monospace; font-size:10px; font-weight:700; flex-shrink:0;
-}
+/* mobile filter button */
+#filtBtn { display:none; align-items:center; gap:5px; padding:6px 12px; border-radius:20px; border:1px solid var(--bdr); background:var(--sur2); cursor:pointer; color:var(--txt); font-family:'Space Mono',monospace; font-size:10px; font-weight:700; flex-shrink:0; }
 
-/* ═══════════════════════════════════════
-   SIDEBAR  — fixed left panel (desktop)
-═══════════════════════════════════════ */
+/* ════════════════════════════════════════════
+   DESKTOP SIDEBAR  z=800  (left:0, top:56px, bottom:0)
+════════════════════════════════════════════ */
 #sidebar {
-  position:fixed; inset:var(--HH) auto 0 0; width:var(--SB); z-index:400;
-  background:var(--surface); border-right:1px solid var(--border);
+  position:fixed; top:56px; left:0; bottom:0; width:290px; z-index:800;
+  background:var(--sur); border-right:1px solid var(--bdr);
   display:flex; flex-direction:column; overflow:hidden;
 }
-.srch { padding:10px 12px; border-bottom:1px solid var(--border); flex-shrink:0; }
-.srch input {
-  width:100%; background:var(--surface2); border:1px solid var(--border);
-  border-radius:8px; color:var(--text); font-family:'DM Sans',sans-serif;
-  font-size:13px; padding:8px 12px; outline:none; transition:border-color .2s;
-}
-.srch input::placeholder { color:var(--muted); }
-.srch input:focus { border-color:var(--accent); }
-#schoolList { overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch; }
-#schoolList::-webkit-scrollbar { width:3px; }
-#schoolList::-webkit-scrollbar-thumb { background:var(--border); }
+.sinput-wrap { padding:10px 12px; border-bottom:1px solid var(--bdr); flex-shrink:0; }
+.sinput-wrap input, .mob-input { width:100%; background:var(--sur2); border:1px solid var(--bdr); border-radius:8px; color:var(--txt); font-family:'DM Sans',sans-serif; font-size:13px; padding:8px 12px; outline:none; transition:border-color .2s; }
+.sinput-wrap input::placeholder, .mob-input::placeholder { color:var(--mut); }
+.sinput-wrap input:focus, .mob-input:focus { border-color:var(--acc); }
+.slist { overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch; }
+.slist::-webkit-scrollbar { width:3px; }
+.slist::-webkit-scrollbar-thumb { background:var(--bdr); }
 
-/* ═══════════════════════════════════════
-   MAP WRAPPER + MAP
-═══════════════════════════════════════ */
+/* ════════════════════════════════════════════
+   MAP WRAPPER  z=100
+   Desktop: left=290px (beside sidebar)
+════════════════════════════════════════════ */
 #mapWrap {
-  position:fixed; inset:var(--HH) 0 0 var(--SB); z-index:100;
-  overflow:hidden;
+  position:fixed; top:56px; right:0; bottom:0; left:290px; z-index:100;
 }
-#map {
-  width:100%; height:100%;
-}
+#map { position:absolute; top:0; left:0; right:0; bottom:0; }
 
-/* ═══════════════════════════════════════
-   SCHOOL CARDS
-═══════════════════════════════════════ */
-.tier-hdr {
-  padding:7px 12px 4px; font-family:'Space Mono',monospace; font-size:9px;
-  font-weight:700; letter-spacing:.12em; text-transform:uppercase;
-  border-bottom:1px solid var(--border); display:flex; align-items:center; gap:6px;
-  position:sticky; top:0; background:var(--surface); z-index:5;
-}
-.tier-dot { width:7px; height:7px; border-radius:50%; }
-
-.scard {
-  display:flex; align-items:flex-start; gap:10px;
-  padding:10px 12px; border-bottom:1px solid var(--border);
-  cursor:pointer; transition:background .12s; border-left:3px solid transparent;
-}
-.scard:hover, .scard.sel { background:var(--surface2); }
+/* ════════════════════════════════════════════
+   SCHOOL CARDS (shared)
+════════════════════════════════════════════ */
+.thdr { padding:7px 12px 4px; font-family:'Space Mono',monospace; font-size:9px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; border-bottom:1px solid var(--bdr); display:flex; align-items:center; gap:6px; position:sticky; top:0; background:var(--sur); z-index:5; }
+.tdot { width:7px; height:7px; border-radius:50%; }
+.scard { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-bottom:1px solid var(--bdr); cursor:pointer; transition:background .12s; border-left:3px solid transparent; }
+.scard:hover, .scard.sel { background:var(--sur2); }
 .scard.t1{border-left-color:var(--t1);} .scard.t2{border-left-color:var(--t2);}
 .scard.t3{border-left-color:var(--t3);} .scard.t4{border-left-color:var(--t4);}
-.rnk {
-  font-family:'Space Mono',monospace; font-size:9px; font-weight:700;
-  width:30px; height:30px; border-radius:7px; flex-shrink:0; margin-top:1px;
-  display:flex; align-items:center; justify-content:center;
-}
+.rnk { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; width:30px; height:30px; border-radius:7px; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; }
 .sname { font-size:12px; font-weight:500; line-height:1.35; }
-.scity { font-size:10.5px; color:var(--muted); margin-top:2px; }
-.card-links { display:flex; gap:5px; margin-top:6px; }
-.cl {
-  font-family:'Space Mono',monospace; font-size:9px; font-weight:700;
-  padding:3px 7px; border-radius:4px; text-decoration:none;
-  display:inline-flex; align-items:center; gap:3px; transition:opacity .15s;
-}
+.scity { font-size:10.5px; color:var(--mut); margin-top:2px; }
+.clinks { display:flex; gap:5px; margin-top:6px; }
+.cl { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; padding:3px 7px; border-radius:4px; text-decoration:none; display:inline-flex; align-items:center; gap:3px; transition:opacity .15s; }
 .cl:hover { opacity:.75; }
-.cl-map { background:#1a73e822; color:#1a73e8; border:1px solid #1a73e844; }
-.cl-web { background:var(--surface); color:var(--muted); border:1px solid var(--border); }
+.cl-m { background:#1a73e822; color:#1a73e8; border:1px solid #1a73e844; }
+.cl-w { background:var(--sur); color:var(--mut); border:1px solid var(--bdr); }
 
-/* ═══════════════════════════════════════
-   STATS PILL
-═══════════════════════════════════════ */
-#statsPill {
-  position:fixed; bottom:18px; left:calc(var(--SB) + 50%); transform:translateX(-50%);
-  z-index:300; pointer-events:none;
+/* ════════════════════════════════════════════
+   STATS PILL  (desktop only)
+════════════════════════════════════════════ */
+#pill {
+  position:fixed; bottom:18px; left:calc(290px + 50%); transform:translateX(-50%);
+  z-index:200; pointer-events:none;
   background:rgba(8,11,18,.9); backdrop-filter:blur(10px);
-  border:1px solid var(--border); border-radius:30px; display:flex; overflow:hidden;
+  border:1px solid var(--bdr); border-radius:30px; display:flex; overflow:hidden;
 }
-.sp { padding:6px 16px; text-align:center; border-right:1px solid var(--border); }
+.sp { padding:6px 16px; text-align:center; border-right:1px solid var(--bdr); }
 .sp:last-child { border-right:none; }
-.sp-n { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; color:var(--accent); }
-.sp-l { font-family:'Space Mono',monospace; font-size:8px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+.spn { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; color:var(--acc); }
+.spl { font-family:'Space Mono',monospace; font-size:8px; color:var(--mut); letter-spacing:.1em; text-transform:uppercase; }
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════════════════
    INFO WINDOW
-═══════════════════════════════════════ */
+════════════════════════════════════════════ */
 .iw { padding:4px 2px; min-width:230px; max-width:270px; font-family:'DM Sans',sans-serif; }
-.iw-r { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; margin-bottom:4px; }
-.iw-n { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; line-height:1.25; margin-bottom:4px; color:#111; }
-.iw-c { font-size:11px; color:#666; }
-.iw-hr { border:none; border-top:1px solid #e8eaf0; margin:9px 0 8px; }
-.iw-btns { display:flex; gap:6px; }
-.iw-btn {
-  display:inline-flex; align-items:center; gap:5px; padding:7px 11px; border-radius:7px;
-  font-size:11px; font-weight:600; text-decoration:none; font-family:'DM Sans',sans-serif;
-  transition:opacity .15s; white-space:nowrap; flex:1; justify-content:center;
-}
-.iw-btn:hover { opacity:.82; }
-.iw-bm { background:#1a73e8; color:#fff; }
-.iw-bw { background:#f1f3f4; color:#333; border:1px solid #dadce0; }
+.iwr { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; margin-bottom:4px; }
+.iwn { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; line-height:1.25; margin-bottom:4px; color:#111; }
+.iwc { font-size:11px; color:#666; }
+.iwhr { border:none; border-top:1px solid #e8eaf0; margin:9px 0 8px; }
+.iwbtns { display:flex; gap:6px; }
+.iwb { display:inline-flex; align-items:center; gap:5px; padding:7px 11px; border-radius:7px; font-size:11px; font-weight:600; text-decoration:none; font-family:'DM Sans',sans-serif; transition:opacity .15s; white-space:nowrap; flex:1; justify-content:center; }
+.iwb:hover { opacity:.82; }
+.iwbm { background:#1a73e8; color:#fff; }
+.iwbw { background:#f1f3f4; color:#333; border:1px solid #dadce0; }
 
-/* ═══════════════════════════════════════
-   MOBILE FILTER PANEL
-═══════════════════════════════════════ */
-#filterPanel {
-  position:fixed; inset:var(--HH) 0 auto 0; z-index:490;
-  background:var(--surface); border-bottom:1px solid var(--border);
-  padding:10px 14px; gap:6px; flex-wrap:wrap;
-  box-shadow:0 4px 20px rgba(0,0,0,.5);
-  display:none;
-}
-#filterPanel.open { display:flex; }
-#filterPanel .leg { padding:7px 14px; }
-#filterPanel .leg-txt { font-size:11px; }
+/* ════════════════════════════════════════════
+   MOBILE ONLY ELEMENTS (hidden on desktop)
+════════════════════════════════════════════ */
 
-/* ═══════════════════════════════════════
-   MOBILE: TAB BAR
-═══════════════════════════════════════ */
+/* Tab bar  z=900 */
 #tabBar {
   display:none;
-  position:fixed; inset:auto 0 0 0; height:var(--TB); z-index:500;
+  position:fixed; left:0; right:0; bottom:0; height:56px; z-index:900;
   background:rgba(8,11,18,.97); backdrop-filter:blur(18px);
-  border-top:1px solid var(--border);
+  border-top:1px solid var(--bdr);
 }
-.tab-btn {
-  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:3px; cursor:pointer; background:none; border:none; color:var(--muted);
-  padding:6px; transition:color .15s;
-}
-.tab-btn.active { color:var(--accent); }
-.tab-btn svg { width:20px; height:20px; }
-.tab-lbl { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; }
+.tbtn { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; background:none; border:none; color:var(--mut); padding:6px; transition:color .15s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+.tbtn.act { color:var(--acc); }
+.tbtn svg { width:20px; height:20px; pointer-events:none; }
+.tlbl { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; pointer-events:none; }
 
-/* ═══════════════════════════════════════
-   MOBILE: BOTTOM SHEET
-═══════════════════════════════════════ */
-#bottomSheet {
-  position:fixed; inset:auto 0 0 0; z-index:450;
-  background:var(--surface); border-radius:20px 20px 0 0;
-  border-top:1px solid var(--border); box-shadow:0 -8px 40px rgba(0,0,0,.6);
-  transform:translateY(100%); transition:transform .35s cubic-bezier(.32,.72,0,1);
-  max-height:80vh; display:flex; flex-direction:column;
-}
-#bottomSheet.open { transform:translateY(0); }
-.sh-handle-wrap { padding:10px 16px 6px; display:flex; flex-direction:column; align-items:center; gap:8px; flex-shrink:0; }
-.sh-handle { width:36px; height:4px; border-radius:2px; background:var(--border); }
-.sh-top { display:flex; align-items:center; justify-content:space-between; width:100%; }
-.sh-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; }
-.sh-close {
-  width:28px; height:28px; border-radius:50%; background:var(--surface2);
-  border:1px solid var(--border); color:var(--muted); font-size:18px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; line-height:1;
-}
-.sh-srch { padding:0 12px 10px; flex-shrink:0; }
-.sh-srch input {
-  width:100%; background:var(--surface2); border:1px solid var(--border);
-  border-radius:8px; color:var(--text); font-family:'DM Sans',sans-serif;
-  font-size:14px; padding:9px 13px; outline:none; transition:border-color .2s;
-}
-.sh-srch input::placeholder { color:var(--muted); }
-.sh-srch input:focus { border-color:var(--accent); }
-#sheetList { overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch; }
-#sheetList::-webkit-scrollbar { width:3px; }
-#sheetList::-webkit-scrollbar-thumb { background:var(--border); }
-
-/* ═══════════════════════════════════════
-   MOBILE: LIST VIEW  (full screen list)
-═══════════════════════════════════════ */
+/* Mobile List View  z=500 */
 #listView {
-  position:fixed; inset:var(--HH) 0 var(--TB) 0; z-index:200;
-  background:var(--surface); display:none; flex-direction:column;
-  overflow:hidden;
+  display:none;
+  position:fixed; top:56px; right:0; bottom:56px; left:0; z-index:500;
+  background:var(--sur); flex-direction:column; overflow:hidden;
 }
-#listView.active { display:flex; }
-.lv-srch { padding:10px 12px; border-bottom:1px solid var(--border); flex-shrink:0; }
-.lv-srch input {
-  width:100%; background:var(--surface2); border:1px solid var(--border);
-  border-radius:8px; color:var(--text); font-family:'DM Sans',sans-serif;
-  font-size:14px; padding:9px 13px; outline:none; transition:border-color .2s;
-}
-.lv-srch input::placeholder { color:var(--muted); }
-.lv-srch input:focus { border-color:var(--accent); }
+#listView.act { display:flex; }
+.lv-s { padding:10px 12px; border-bottom:1px solid var(--bdr); flex-shrink:0; }
+.lv-s input { width:100%; background:var(--sur2); border:1px solid var(--bdr); border-radius:8px; color:var(--txt); font-family:'DM Sans',sans-serif; font-size:14px; padding:9px 13px; outline:none; transition:border-color .2s; }
+.lv-s input::placeholder { color:var(--mut); }
+.lv-s input:focus { border-color:var(--acc); }
 #listViewList { overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch; }
-#listViewList::-webkit-scrollbar { width:3px; }
-#listViewList::-webkit-scrollbar-thumb { background:var(--border); }
 
-/* ═══════════════════════════════════════
-   RESPONSIVE
-═══════════════════════════════════════ */
-@media (max-width: 768px) {
-  :root { --HH:52px; }
+/* Bottom Sheet  z=700 */
+#bsheet {
+  display:none;
+  position:fixed; left:0; right:0; bottom:56px; z-index:700;
+  background:var(--sur); border-radius:20px 20px 0 0;
+  border-top:1px solid var(--bdr); box-shadow:0 -8px 40px rgba(0,0,0,.6);
+  transform:translateY(100%); transition:transform .35s cubic-bezier(.32,.72,0,1);
+  max-height:78vh; flex-direction:column;
+}
+#bsheet.act { transform:translateY(0); }
+.bsh-wrap { padding:10px 16px 6px; display:flex; flex-direction:column; align-items:center; gap:8px; flex-shrink:0; }
+.bsh-handle { width:36px; height:4px; border-radius:2px; background:var(--bdr); }
+.bsh-top { display:flex; align-items:center; justify-content:space-between; width:100%; }
+.bsh-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; }
+.bsh-close { width:28px; height:28px; border-radius:50%; background:var(--sur2); border:1px solid var(--bdr); color:var(--mut); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; touch-action:manipulation; }
+.bsh-s { padding:0 12px 10px; flex-shrink:0; }
+.bsh-s input { width:100%; background:var(--sur2); border:1px solid var(--bdr); border-radius:8px; color:var(--txt); font-family:'DM Sans',sans-serif; font-size:14px; padding:9px 13px; outline:none; }
+.bsh-s input::placeholder { color:var(--mut); }
+.bsh-s input:focus { border-color:var(--acc); }
+#bsheetList { overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch; }
 
-  /* hide desktop elements */
-  .leg-row  { display:none; }
-  #sidebar  { display:none; }
-  #statsPill{ display:none; }
-  #mapWrap  { inset:var(--HH) 0 var(--TB) 0; left:0; }
+/* Mobile filter panel  z=850 */
+#filtPanel {
+  display:none;
+  position:fixed; top:56px; left:0; right:0; z-index:850;
+  background:var(--sur); border-bottom:1px solid var(--bdr);
+  padding:10px 14px; gap:6px; flex-wrap:wrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+#filtPanel.act { display:flex; }
+#filtPanel .leg { padding:7px 14px; }
+#filtPanel .lt   { font-size:11px; }
 
-  /* show mobile elements */
-  #filterBtn { display:flex; }
-  #tabBar    { display:flex; }
+/* ════════════════════════════════════════════
+   MOBILE BREAKPOINT
+   Key change: mapWrap left:0 (no sidebar)
+════════════════════════════════════════════ */
+@media (max-width:768px) {
+  /* header stays 56px */
+  #hdr { height:56px; }
 
-  /* map fills full height between header and tab bar */
-  #mapWrap { inset:var(--HH) 0 var(--TB) 0; }
+  /* hide desktop-only */
+  #legRow  { display:none; }
+  #sidebar { display:none; }
+  #pill    { display:none; }
+
+  /* show mobile-only */
+  #filtBtn { display:flex; }
+  #tabBar  { display:flex; }
+  #listView { display:none; } /* shown via JS */
+  #bsheet   { display:flex; } /* flex but translateY'd off screen */
+
+  /* MAP: full width, header to tabbar */
+  #mapWrap {
+    position:fixed;
+    top:56px;
+    right:0;
+    bottom:56px;
+    left:0;
+    z-index:100;
+  }
 }
 
-@media (max-width: 400px) {
-  .htitle { font-size:13px; }
-  .eyebrow { font-size:7px; }
+@media (max-width:400px) {
+  .ht { font-size:13px; }
+  .ey { font-size:7px; }
 }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
-<div id="header">
+<div id="hdr">
   <div class="brand">
-    <div class="eyebrow">U.S. News &amp; World Report · 2026</div>
-    <div class="htitle">CS Rankings <span>Top 100</span></div>
+    <div class="ey">U.S. News &amp; World Report · 2026</div>
+    <div class="ht">CS Rankings <span>Top 100</span></div>
   </div>
-  <div class="leg-row" id="legRow">
-    <div class="leg on" data-tier="1"><div class="leg-dot" style="background:var(--t1)"></div><span class="leg-txt" style="color:var(--t1)">Top 10</span></div>
-    <div class="leg on" data-tier="2"><div class="leg-dot" style="background:var(--t2)"></div><span class="leg-txt" style="color:var(--t2)">#11–30</span></div>
-    <div class="leg on" data-tier="3"><div class="leg-dot" style="background:var(--t3)"></div><span class="leg-txt" style="color:var(--t3)">#31–50</span></div>
-    <div class="leg on" data-tier="4"><div class="leg-dot" style="background:var(--t4)"></div><span class="leg-txt" style="color:var(--t4)">#51–100</span></div>
+  <div id="legRow">
+    <div class="leg on" data-tier="1"><div class="ld" style="background:var(--t1)"></div><span class="lt" style="color:var(--t1)">Top 10</span></div>
+    <div class="leg on" data-tier="2"><div class="ld" style="background:var(--t2)"></div><span class="lt" style="color:var(--t2)">#11–30</span></div>
+    <div class="leg on" data-tier="3"><div class="ld" style="background:var(--t3)"></div><span class="lt" style="color:var(--t3)">#31–50</span></div>
+    <div class="leg on" data-tier="4"><div class="ld" style="background:var(--t4)"></div><span class="lt" style="color:var(--t4)">#51–100</span></div>
   </div>
-  <div id="filterBtn">
+  <div id="filtBtn">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0019 4H5a1 1 0 00-.75 1.61z"/></svg>
     Filter
   </div>
 </div>
 
 <!-- MOBILE FILTER PANEL -->
-<div id="filterPanel">
-  <div class="leg on" data-tier="1"><div class="leg-dot" style="background:var(--t1)"></div><span class="leg-txt" style="color:var(--t1)">Top 10</span></div>
-  <div class="leg on" data-tier="2"><div class="leg-dot" style="background:var(--t2)"></div><span class="leg-txt" style="color:var(--t2)">#11–30</span></div>
-  <div class="leg on" data-tier="3"><div class="leg-dot" style="background:var(--t3)"></div><span class="leg-txt" style="color:var(--t3)">#31–50</span></div>
-  <div class="leg on" data-tier="4"><div class="leg-dot" style="background:var(--t4)"></div><span class="leg-txt" style="color:var(--t4)">#51–100</span></div>
+<div id="filtPanel">
+  <div class="leg on" data-tier="1"><div class="ld" style="background:var(--t1)"></div><span class="lt" style="color:var(--t1)">Top 10</span></div>
+  <div class="leg on" data-tier="2"><div class="ld" style="background:var(--t2)"></div><span class="lt" style="color:var(--t2)">#11–30</span></div>
+  <div class="leg on" data-tier="3"><div class="ld" style="background:var(--t3)"></div><span class="lt" style="color:var(--t3)">#31–50</span></div>
+  <div class="leg on" data-tier="4"><div class="ld" style="background:var(--t4)"></div><span class="lt" style="color:var(--t4)">#51–100</span></div>
 </div>
 
 <!-- DESKTOP SIDEBAR -->
 <div id="sidebar">
-  <div class="srch"><input id="searchDesk" type="text" placeholder="Search schools or cities…"></div>
-  <div id="schoolList"></div>
+  <div class="sinput-wrap"><input id="deskSearch" type="text" placeholder="Search schools or cities…"></div>
+  <div class="slist" id="deskList"></div>
 </div>
 
 <!-- MAP -->
 <div id="mapWrap"><div id="map"></div></div>
 
-<!-- STATS PILL (desktop) -->
-<div id="statsPill">
-  <div class="sp"><div class="sp-n">100</div><div class="sp-l">Schools</div></div>
-  <div class="sp"><div class="sp-n">35+</div><div class="sp-l">States</div></div>
-  <div class="sp"><div class="sp-n">2026</div><div class="sp-l">Edition</div></div>
+<!-- STATS PILL -->
+<div id="pill">
+  <div class="sp"><div class="spn">100</div><div class="spl">Schools</div></div>
+  <div class="sp"><div class="spn">35+</div><div class="spl">States</div></div>
+  <div class="sp"><div class="spn">2026</div><div class="spl">Edition</div></div>
 </div>
 
-<!-- MOBILE: MAP is reused (#map above), LIST VIEW panel -->
+<!-- MOBILE LIST VIEW -->
 <div id="listView">
-  <div class="lv-srch"><input id="searchList" type="text" placeholder="Search schools or cities…"></div>
-  <div id="listViewList"></div>
+  <div class="lv-s"><input id="listSearch" type="text" placeholder="Search schools or cities…"></div>
+  <div id="listViewList" class="slist"></div>
 </div>
 
-<!-- MOBILE: BOTTOM SHEET (search) -->
-<div id="bottomSheet">
-  <div class="sh-handle-wrap">
-    <div class="sh-handle"></div>
-    <div class="sh-top">
-      <span class="sh-title">Search Schools</span>
-      <div class="sh-close" id="sheetClose">×</div>
+<!-- MOBILE BOTTOM SHEET (search) -->
+<div id="bsheet">
+  <div class="bsh-wrap">
+    <div class="bsh-handle"></div>
+    <div class="bsh-top">
+      <span class="bsh-title">Search Schools</span>
+      <div class="bsh-close" id="bshClose">×</div>
     </div>
   </div>
-  <div class="sh-srch"><input id="searchSheet" type="text" placeholder="Search schools or cities…"></div>
-  <div id="sheetList"></div>
+  <div class="bsh-s"><input id="sheetSearch" type="text" placeholder="Search schools or cities…"></div>
+  <div id="bsheetList" class="slist"></div>
 </div>
 
-<!-- MOBILE: TAB BAR -->
+<!-- MOBILE TAB BAR -->
 <div id="tabBar">
-  <button class="tab-btn active" id="tabMap">
+  <button class="tbtn act" id="tabMap">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
-    <span class="tab-lbl">Map</span>
+    <span class="tlbl">Map</span>
   </button>
-  <button class="tab-btn" id="tabList">
+  <button class="tbtn" id="tabList">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
-    <span class="tab-lbl">List</span>
+    <span class="tlbl">List</span>
   </button>
-  <button class="tab-btn" id="tabSearch">
+  <button class="tbtn" id="tabSearch">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-    <span class="tab-lbl">Search</span>
+    <span class="tlbl">Search</span>
   </button>
 </div>
 
 <script>
-const TC  = {1:'#f0455a',2:'#ff8c3a',3:'#3dd68c',4:'#38b4f5'};
-const TL  = {1:'Top 10',2:'#11–30',3:'#31–50',4:'#51–100'};
-const TTX = {1:'#fff',2:'#fff',3:'#080b12',4:'#080b12'};
-const tierVis = {1:true,2:true,3:true,4:true};
+const TC={1:'#f0455a',2:'#ff8c3a',3:'#3dd68c',4:'#38b4f5'};
+const TL={1:'Top 10',2:'#11–30',3:'#31–50',4:'#51–100'};
+const TX={1:'#fff',2:'#fff',3:'#080b12',4:'#080b12'};
+const TV={1:true,2:true,3:true,4:true};
 
-const SCHOOLS = [
-  {r:1, n:"Carnegie Mellon University",          c:"Pittsburgh, PA",      lat:40.4432,lng:-79.9428,t:1,w:"https://www.cs.cmu.edu"},
-  {r:1, n:"MIT",                                 c:"Cambridge, MA",       lat:42.3601,lng:-71.0942,t:1,w:"https://www.csail.mit.edu"},
-  {r:1, n:"Stanford University",                 c:"Stanford, CA",        lat:37.4275,lng:-122.1697,t:1,w:"https://cs.stanford.edu"},
-  {r:4, n:"UC Berkeley",                         c:"Berkeley, CA",        lat:37.8724,lng:-122.2595,t:1,w:"https://eecs.berkeley.edu"},
-  {r:5, n:"Univ. of Illinois Urbana-Champaign",  c:"Champaign, IL",       lat:40.1020,lng:-88.2272,t:1,w:"https://cs.illinois.edu"},
-  {r:6, n:"Cornell University",                  c:"Ithaca, NY",          lat:42.4534,lng:-76.4735,t:1,w:"https://www.cs.cornell.edu"},
-  {r:6, n:"University of Washington",            c:"Seattle, WA",         lat:47.6553,lng:-122.3035,t:1,w:"https://www.cs.washington.edu"},
-  {r:8, n:"Georgia Tech",                        c:"Atlanta, GA",         lat:33.7756,lng:-84.3963,t:1,w:"https://www.cc.gatech.edu"},
-  {r:9, n:"Princeton University",                c:"Princeton, NJ",       lat:40.3431,lng:-74.6514,t:1,w:"https://www.cs.princeton.edu"},
-  {r:10,n:"UT Austin",                           c:"Austin, TX",          lat:30.2849,lng:-97.7341,t:1,w:"https://www.cs.utexas.edu"},
-  {r:11,n:"Columbia University",                 c:"New York, NY",        lat:40.8075,lng:-73.9626,t:2,w:"https://www.cs.columbia.edu"},
-  {r:11,n:"UC San Diego",                        c:"La Jolla, CA",        lat:32.8801,lng:-117.2340,t:2,w:"https://cse.ucsd.edu"},
-  {r:13,n:"Univ. of Michigan–Ann Arbor",         c:"Ann Arbor, MI",       lat:42.2780,lng:-83.7382,t:2,w:"https://cse.engin.umich.edu"},
-  {r:14,n:"Yale University",                     c:"New Haven, CT",       lat:41.3163,lng:-72.9223,t:2,w:"https://cpsc.yale.edu"},
-  {r:15,n:"Purdue University",                   c:"West Lafayette, IN",  lat:40.4259,lng:-86.9081,t:2,w:"https://www.cs.purdue.edu"},
-  {r:15,n:"Univ. of Maryland–College Park",      c:"College Park, MD",    lat:38.9869,lng:-76.9426,t:2,w:"https://www.cs.umd.edu"},
-  {r:17,n:"Harvard University",                  c:"Cambridge, MA",       lat:42.3770,lng:-71.1167,t:2,w:"https://www.seas.harvard.edu/computer-science"},
-  {r:17,n:"UCLA",                                c:"Los Angeles, CA",     lat:34.0689,lng:-118.4452,t:2,w:"https://www.cs.ucla.edu"},
-  {r:19,n:"Univ. of Wisconsin–Madison",          c:"Madison, WI",         lat:43.0766,lng:-89.4125,t:2,w:"https://www.cs.wisc.edu"},
-  {r:20,n:"Duke University",                     c:"Durham, NC",          lat:36.0014,lng:-78.9382,t:2,w:"https://cs.duke.edu"},
-  {r:20,n:"UMass Amherst",                       c:"Amherst, MA",         lat:42.3868,lng:-72.5301,t:2,w:"https://www.cics.umass.edu"},
-  {r:20,n:"Univ. of Pennsylvania",               c:"Philadelphia, PA",    lat:39.9522,lng:-75.1932,t:2,w:"https://www.cis.upenn.edu"},
-  {r:23,n:"Johns Hopkins University",            c:"Baltimore, MD",       lat:39.3299,lng:-76.6205,t:2,w:"https://www.cs.jhu.edu"},
-  {r:23,n:"New York University",                 c:"New York, NY",        lat:40.7295,lng:-73.9965,t:2,w:"https://cs.nyu.edu"},
-  {r:25,n:"Brown University",                    c:"Providence, RI",      lat:41.8268,lng:-71.4025,t:2,w:"https://cs.brown.edu"},
-  {r:25,n:"Rice University",                     c:"Houston, TX",         lat:29.7174,lng:-95.4018,t:2,w:"https://cs.rice.edu"},
-  {r:25,n:"Rutgers Univ.–New Brunswick",         c:"Piscataway, NJ",      lat:40.5008,lng:-74.4474,t:2,w:"https://www.cs.rutgers.edu"},
-  {r:25,n:"UC Santa Barbara",                    c:"Santa Barbara, CA",   lat:34.4140,lng:-119.8489,t:2,w:"https://cs.ucsb.edu"},
-  {r:29,n:"Boston University",                   c:"Boston, MA",          lat:42.3505,lng:-71.1054,t:2,w:"https://www.bu.edu/cs"},
-  {r:29,n:"Dartmouth College",                   c:"Hanover, NH",         lat:43.7044,lng:-72.2887,t:2,w:"https://web.cs.dartmouth.edu"},
-  {r:31,n:"Arizona State University",            c:"Tempe, AZ",           lat:33.4255,lng:-111.9400,t:3,w:"https://scai.engineering.asu.edu"},
-  {r:31,n:"NC State University",                 c:"Raleigh, NC",         lat:35.7848,lng:-78.6821,t:3,w:"https://www.csc.ncsu.edu"},
-  {r:31,n:"Stony Brook Univ. (SUNY)",            c:"Stony Brook, NY",     lat:40.9148,lng:-73.1236,t:3,w:"https://www.cs.stonybrook.edu"},
-  {r:34,n:"Virginia Tech",                       c:"Blacksburg, VA",      lat:37.2284,lng:-80.4234,t:3,w:"https://cs.vt.edu"},
-  {r:34,n:"Univ. of Minnesota–Twin Cities",      c:"Minneapolis, MN",     lat:44.9740,lng:-93.2277,t:3,w:"https://cse.umn.edu"},
-  {r:36,n:"UC Irvine",                           c:"Irvine, CA",          lat:33.6405,lng:-117.8443,t:3,w:"https://www.ics.uci.edu"},
-  {r:37,n:"Ohio State University",               c:"Columbus, OH",        lat:40.0076,lng:-83.0300,t:3,w:"https://cse.osu.edu"},
-  {r:38,n:"Univ. of Colorado Boulder",           c:"Boulder, CO",         lat:40.0076,lng:-105.2659,t:3,w:"https://www.colorado.edu/cs"},
-  {r:39,n:"Michigan State University",           c:"East Lansing, MI",    lat:42.7018,lng:-84.4822,t:3,w:"https://www.cse.msu.edu"},
-  {r:39,n:"Penn State University",               c:"University Park, PA", lat:40.7934,lng:-77.8600,t:3,w:"https://www.cse.psu.edu"},
-  {r:41,n:"Northeastern University",             c:"Boston, MA",          lat:42.3398,lng:-71.0892,t:3,w:"https://www.khoury.northeastern.edu"},
-  {r:41,n:"UC Davis",                            c:"Davis, CA",           lat:38.5382,lng:-121.7617,t:3,w:"https://cs.ucdavis.edu"},
-  {r:43,n:"Indiana University",                  c:"Bloomington, IN",     lat:39.1682,lng:-86.5230,t:3,w:"https://luddy.indiana.edu"},
-  {r:43,n:"Univ. of Arizona",                    c:"Tucson, AZ",          lat:32.2319,lng:-110.9501,t:3,w:"https://www.cs.arizona.edu"},
-  {r:45,n:"Univ. of Florida",                    c:"Gainesville, FL",     lat:29.6516,lng:-82.3248,t:3,w:"https://www.cise.ufl.edu"},
-  {r:46,n:"Harvey Mudd College",                 c:"Claremont, CA",       lat:34.1066,lng:-117.7109,t:3,w:"https://www.hmc.edu/cs"},
-  {r:47,n:"Univ. of Virginia",                   c:"Charlottesville, VA", lat:38.0336,lng:-78.5080,t:3,w:"https://engineering.virginia.edu/departments/computer-science"},
-  {r:47,n:"Vanderbilt University",               c:"Nashville, TN",       lat:36.1447,lng:-86.8027,t:3,w:"https://www.cs.vanderbilt.edu"},
-  {r:49,n:"Worcester Polytechnic Inst.",         c:"Worcester, MA",       lat:42.2746,lng:-71.8063,t:3,w:"https://www.wpi.edu/academics/departments/computer-science"},
-  {r:50,n:"Univ. of Rochester",                  c:"Rochester, NY",       lat:43.1285,lng:-77.6278,t:3,w:"https://www.cs.rochester.edu"},
-  {r:51,n:"Univ. of Pittsburgh",                 c:"Pittsburgh, PA",      lat:40.4444,lng:-79.9608,t:4,w:"https://www.cs.pitt.edu"},
-  {r:51,n:"Tufts University",                    c:"Medford, MA",         lat:42.4075,lng:-71.1190,t:4,w:"https://engineering.tufts.edu/cs"},
-  {r:53,n:"Univ. of Notre Dame",                 c:"Notre Dame, IN",      lat:41.6996,lng:-86.2353,t:4,w:"https://cse.nd.edu"},
-  {r:53,n:"Univ. of Utah",                       c:"Salt Lake City, UT",  lat:40.7649,lng:-111.8421,t:4,w:"https://www.cs.utah.edu"},
-  {r:55,n:"Washington Univ. in St. Louis",       c:"St. Louis, MO",       lat:38.6488,lng:-90.3108,t:4,w:"https://cse.wustl.edu"},
-  {r:55,n:"Rensselaer Polytechnic Inst.",        c:"Troy, NY",            lat:42.7298,lng:-73.6791,t:4,w:"https://www.cs.rpi.edu"},
-  {r:57,n:"UC Riverside",                        c:"Riverside, CA",       lat:33.9537,lng:-117.3961,t:4,w:"https://www1.cs.ucr.edu"},
-  {r:57,n:"Iowa State University",               c:"Ames, IA",            lat:42.0267,lng:-93.6465,t:4,w:"https://www.cs.iastate.edu"},
-  {r:59,n:"UC Santa Cruz",                       c:"Santa Cruz, CA",      lat:36.9916,lng:-122.0583,t:4,w:"https://engineering.ucsc.edu/departments/computer-science-and-engineering"},
-  {r:59,n:"Emory University",                    c:"Atlanta, GA",         lat:33.7915,lng:-84.3239,t:4,w:"https://cs.emory.edu"},
-  {r:61,n:"SUNY–Albany",                         c:"Albany, NY",          lat:42.6882,lng:-73.8271,t:4,w:"https://www.cs.albany.edu"},
-  {r:62,n:"Univ. of Illinois–Chicago",           c:"Chicago, IL",         lat:41.8720,lng:-87.6480,t:4,w:"https://cs.uic.edu"},
-  {r:62,n:"Texas A&M University",                c:"College Station, TX", lat:30.6187,lng:-96.3365,t:4,w:"https://engineering.tamu.edu/cse"},
-  {r:64,n:"Case Western Reserve Univ.",          c:"Cleveland, OH",       lat:41.5042,lng:-81.6091,t:4,w:"https://engineering.case.edu/computer-and-data-sciences"},
-  {r:64,n:"George Mason University",             c:"Fairfax, VA",         lat:38.8316,lng:-77.3072,t:4,w:"https://cs.gmu.edu"},
-  {r:66,n:"Oregon State University",             c:"Corvallis, OR",       lat:44.5638,lng:-123.2794,t:4,w:"https://eecs.oregonstate.edu"},
-  {r:66,n:"Univ. of Tennessee",                  c:"Knoxville, TN",       lat:35.9544,lng:-83.9259,t:4,w:"https://www.eecs.utk.edu"},
-  {r:68,n:"Univ. of Delaware",                   c:"Newark, DE",          lat:39.6785,lng:-75.7516,t:4,w:"https://www.cis.udel.edu"},
-  {r:69,n:"William & Mary",                      c:"Williamsburg, VA",    lat:37.2707,lng:-76.7075,t:4,w:"https://www.wm.edu/as/computerscience"},
-  {r:69,n:"Florida State University",            c:"Tallahassee, FL",     lat:30.4418,lng:-84.2985,t:4,w:"https://www.cs.fsu.edu"},
-  {r:71,n:"Drexel University",                   c:"Philadelphia, PA",    lat:39.9564,lng:-75.1897,t:4,w:"https://drexel.edu/cci/academics/computer-science-department"},
-  {r:72,n:"George Washington Univ.",             c:"Washington, DC",      lat:38.8997,lng:-77.0489,t:4,w:"https://cs.gwu.edu"},
-  {r:73,n:"Univ. of Houston",                    c:"Houston, TX",         lat:29.7199,lng:-95.3422,t:4,w:"https://www.uh.edu/nsm/computer-science"},
-  {r:74,n:"Univ. of Kansas",                     c:"Lawrence, KS",        lat:38.9543,lng:-95.2558,t:4,w:"https://eecs.ku.edu"},
-  {r:75,n:"Clemson University",                  c:"Clemson, SC",         lat:34.6834,lng:-82.8374,t:4,w:"https://www.clemson.edu/cecas/departments/computing"},
-  {r:76,n:"Colorado State University",           c:"Fort Collins, CO",    lat:40.5731,lng:-105.0849,t:4,w:"https://www.cs.colostate.edu"},
-  {r:77,n:"Univ. of Iowa",                       c:"Iowa City, IA",       lat:41.6611,lng:-91.5302,t:4,w:"https://cs.uiowa.edu"},
-  {r:78,n:"Syracuse University",                 c:"Syracuse, NY",        lat:43.0366,lng:-76.1378,t:4,w:"https://ecs.syracuse.edu/academics/electrical-engineering-and-computer-science"},
-  {r:79,n:"Lehigh University",                   c:"Bethlehem, PA",       lat:40.6065,lng:-75.3776,t:4,w:"https://engineering.lehigh.edu/cse"},
-  {r:80,n:"Univ. of Nebraska–Lincoln",           c:"Lincoln, NE",         lat:40.8202,lng:-96.7005,t:4,w:"https://cse.unl.edu"},
-  {r:81,n:"Florida International Univ.",         c:"Miami, FL",           lat:25.7587,lng:-80.3728,t:4,w:"https://www.cis.fiu.edu"},
-  {r:82,n:"Univ. of South Carolina",             c:"Columbia, SC",        lat:33.9966,lng:-81.0299,t:4,w:"https://www.cse.sc.edu"},
-  {r:83,n:"Washington State University",         c:"Pullman, WA",         lat:46.7298,lng:-117.1817,t:4,w:"https://school.eecs.wsu.edu"},
-  {r:84,n:"Illinois Inst. of Technology",        c:"Chicago, IL",         lat:41.8355,lng:-87.6270,t:4,w:"https://www.iit.edu/computer-science"},
-  {r:85,n:"UMBC",                                c:"Baltimore, MD",       lat:39.2561,lng:-76.7143,t:4,w:"https://www.csee.umbc.edu"},
-  {r:86,n:"Wayne State University",              c:"Detroit, MI",         lat:42.3573,lng:-83.0714,t:4,w:"https://engineering.wayne.edu/computer-science"},
-  {r:87,n:"Univ. of Central Florida",            c:"Orlando, FL",         lat:28.6024,lng:-81.2001,t:4,w:"https://www.cs.ucf.edu"},
-  {r:88,n:"Stevens Inst. of Technology",         c:"Hoboken, NJ",         lat:40.7440,lng:-74.0242,t:4,w:"https://www.stevens.edu/school-engineering-science/departments/computer-science"},
-  {r:89,n:"Missouri S&T",                        c:"Rolla, MO",           lat:37.9519,lng:-91.7785,t:4,w:"https://cs.mst.edu"},
-  {r:90,n:"Univ. of Kentucky",                   c:"Lexington, KY",       lat:38.0306,lng:-84.4985,t:4,w:"https://www.engr.uky.edu/research-faculty/departments/computer-science"},
-  {r:91,n:"Univ. of South Florida",              c:"Tampa, FL",           lat:28.0587,lng:-82.4139,t:4,w:"https://www.usf.edu/engineering/cse"},
-  {r:92,n:"CUNY Graduate Center",                c:"New York, NY",        lat:40.7484,lng:-73.9842,t:4,w:"https://www.gc.cuny.edu/computer-science"},
-  {r:93,n:"Univ. of Alabama",                    c:"Tuscaloosa, AL",      lat:33.2098,lng:-87.5692,t:4,w:"https://cs.ua.edu"},
-  {r:94,n:"Binghamton Univ. (SUNY)",             c:"Binghamton, NY",      lat:42.0898,lng:-75.9679,t:4,w:"https://www.binghamton.edu/computer-science"},
-  {r:95,n:"Oklahoma State University",           c:"Stillwater, OK",      lat:36.1269,lng:-97.0737,t:4,w:"https://cs.okstate.edu"},
-  {r:96,n:"New Mexico State University",         c:"Las Cruces, NM",      lat:32.2801,lng:-106.7497,t:4,w:"https://cs.nmsu.edu"},
-  {r:97,n:"Univ. of Arkansas",                   c:"Fayetteville, AR",    lat:36.0679,lng:-94.1741,t:4,w:"https://engineering.uark.edu/computer-science-computer-engineering"},
-  {r:98,n:"Univ. of Connecticut",                c:"Storrs, CT",          lat:41.8077,lng:-72.2535,t:4,w:"https://www.cse.uconn.edu"},
-  {r:99,n:"Univ. of Mississippi",                c:"Oxford, MS",          lat:34.3654,lng:-89.5378,t:4,w:"https://engineering.olemiss.edu/eecs"},
-  {r:100,n:"Portland State University",          c:"Portland, OR",        lat:45.5118,lng:-122.6844,t:4,w:"https://www.pdx.edu/computer-science"},
+const SCHOOLS=[
+  {r:1,n:"Carnegie Mellon University",c:"Pittsburgh, PA",lat:40.4432,lng:-79.9428,t:1,w:"https://www.cs.cmu.edu"},
+  {r:1,n:"MIT",c:"Cambridge, MA",lat:42.3601,lng:-71.0942,t:1,w:"https://www.csail.mit.edu"},
+  {r:1,n:"Stanford University",c:"Stanford, CA",lat:37.4275,lng:-122.1697,t:1,w:"https://cs.stanford.edu"},
+  {r:4,n:"UC Berkeley",c:"Berkeley, CA",lat:37.8724,lng:-122.2595,t:1,w:"https://eecs.berkeley.edu"},
+  {r:5,n:"Univ. of Illinois Urbana-Champaign",c:"Champaign, IL",lat:40.1020,lng:-88.2272,t:1,w:"https://cs.illinois.edu"},
+  {r:6,n:"Cornell University",c:"Ithaca, NY",lat:42.4534,lng:-76.4735,t:1,w:"https://www.cs.cornell.edu"},
+  {r:6,n:"University of Washington",c:"Seattle, WA",lat:47.6553,lng:-122.3035,t:1,w:"https://www.cs.washington.edu"},
+  {r:8,n:"Georgia Tech",c:"Atlanta, GA",lat:33.7756,lng:-84.3963,t:1,w:"https://www.cc.gatech.edu"},
+  {r:9,n:"Princeton University",c:"Princeton, NJ",lat:40.3431,lng:-74.6514,t:1,w:"https://www.cs.princeton.edu"},
+  {r:10,n:"UT Austin",c:"Austin, TX",lat:30.2849,lng:-97.7341,t:1,w:"https://www.cs.utexas.edu"},
+  {r:11,n:"Columbia University",c:"New York, NY",lat:40.8075,lng:-73.9626,t:2,w:"https://www.cs.columbia.edu"},
+  {r:11,n:"UC San Diego",c:"La Jolla, CA",lat:32.8801,lng:-117.2340,t:2,w:"https://cse.ucsd.edu"},
+  {r:13,n:"Univ. of Michigan–Ann Arbor",c:"Ann Arbor, MI",lat:42.2780,lng:-83.7382,t:2,w:"https://cse.engin.umich.edu"},
+  {r:14,n:"Yale University",c:"New Haven, CT",lat:41.3163,lng:-72.9223,t:2,w:"https://cpsc.yale.edu"},
+  {r:15,n:"Purdue University",c:"West Lafayette, IN",lat:40.4259,lng:-86.9081,t:2,w:"https://www.cs.purdue.edu"},
+  {r:15,n:"Univ. of Maryland–College Park",c:"College Park, MD",lat:38.9869,lng:-76.9426,t:2,w:"https://www.cs.umd.edu"},
+  {r:17,n:"Harvard University",c:"Cambridge, MA",lat:42.3770,lng:-71.1167,t:2,w:"https://www.seas.harvard.edu/computer-science"},
+  {r:17,n:"UCLA",c:"Los Angeles, CA",lat:34.0689,lng:-118.4452,t:2,w:"https://www.cs.ucla.edu"},
+  {r:19,n:"Univ. of Wisconsin–Madison",c:"Madison, WI",lat:43.0766,lng:-89.4125,t:2,w:"https://www.cs.wisc.edu"},
+  {r:20,n:"Duke University",c:"Durham, NC",lat:36.0014,lng:-78.9382,t:2,w:"https://cs.duke.edu"},
+  {r:20,n:"UMass Amherst",c:"Amherst, MA",lat:42.3868,lng:-72.5301,t:2,w:"https://www.cics.umass.edu"},
+  {r:20,n:"Univ. of Pennsylvania",c:"Philadelphia, PA",lat:39.9522,lng:-75.1932,t:2,w:"https://www.cis.upenn.edu"},
+  {r:23,n:"Johns Hopkins University",c:"Baltimore, MD",lat:39.3299,lng:-76.6205,t:2,w:"https://www.cs.jhu.edu"},
+  {r:23,n:"New York University",c:"New York, NY",lat:40.7295,lng:-73.9965,t:2,w:"https://cs.nyu.edu"},
+  {r:25,n:"Brown University",c:"Providence, RI",lat:41.8268,lng:-71.4025,t:2,w:"https://cs.brown.edu"},
+  {r:25,n:"Rice University",c:"Houston, TX",lat:29.7174,lng:-95.4018,t:2,w:"https://cs.rice.edu"},
+  {r:25,n:"Rutgers Univ.–New Brunswick",c:"Piscataway, NJ",lat:40.5008,lng:-74.4474,t:2,w:"https://www.cs.rutgers.edu"},
+  {r:25,n:"UC Santa Barbara",c:"Santa Barbara, CA",lat:34.4140,lng:-119.8489,t:2,w:"https://cs.ucsb.edu"},
+  {r:29,n:"Boston University",c:"Boston, MA",lat:42.3505,lng:-71.1054,t:2,w:"https://www.bu.edu/cs"},
+  {r:29,n:"Dartmouth College",c:"Hanover, NH",lat:43.7044,lng:-72.2887,t:2,w:"https://web.cs.dartmouth.edu"},
+  {r:31,n:"Arizona State University",c:"Tempe, AZ",lat:33.4255,lng:-111.9400,t:3,w:"https://scai.engineering.asu.edu"},
+  {r:31,n:"NC State University",c:"Raleigh, NC",lat:35.7848,lng:-78.6821,t:3,w:"https://www.csc.ncsu.edu"},
+  {r:31,n:"Stony Brook Univ. (SUNY)",c:"Stony Brook, NY",lat:40.9148,lng:-73.1236,t:3,w:"https://www.cs.stonybrook.edu"},
+  {r:34,n:"Virginia Tech",c:"Blacksburg, VA",lat:37.2284,lng:-80.4234,t:3,w:"https://cs.vt.edu"},
+  {r:34,n:"Univ. of Minnesota–Twin Cities",c:"Minneapolis, MN",lat:44.9740,lng:-93.2277,t:3,w:"https://cse.umn.edu"},
+  {r:36,n:"UC Irvine",c:"Irvine, CA",lat:33.6405,lng:-117.8443,t:3,w:"https://www.ics.uci.edu"},
+  {r:37,n:"Ohio State University",c:"Columbus, OH",lat:40.0076,lng:-83.0300,t:3,w:"https://cse.osu.edu"},
+  {r:38,n:"Univ. of Colorado Boulder",c:"Boulder, CO",lat:40.0076,lng:-105.2659,t:3,w:"https://www.colorado.edu/cs"},
+  {r:39,n:"Michigan State University",c:"East Lansing, MI",lat:42.7018,lng:-84.4822,t:3,w:"https://www.cse.msu.edu"},
+  {r:39,n:"Penn State University",c:"University Park, PA",lat:40.7934,lng:-77.8600,t:3,w:"https://www.cse.psu.edu"},
+  {r:41,n:"Northeastern University",c:"Boston, MA",lat:42.3398,lng:-71.0892,t:3,w:"https://www.khoury.northeastern.edu"},
+  {r:41,n:"UC Davis",c:"Davis, CA",lat:38.5382,lng:-121.7617,t:3,w:"https://cs.ucdavis.edu"},
+  {r:43,n:"Indiana University",c:"Bloomington, IN",lat:39.1682,lng:-86.5230,t:3,w:"https://luddy.indiana.edu"},
+  {r:43,n:"Univ. of Arizona",c:"Tucson, AZ",lat:32.2319,lng:-110.9501,t:3,w:"https://www.cs.arizona.edu"},
+  {r:45,n:"Univ. of Florida",c:"Gainesville, FL",lat:29.6516,lng:-82.3248,t:3,w:"https://www.cise.ufl.edu"},
+  {r:46,n:"Harvey Mudd College",c:"Claremont, CA",lat:34.1066,lng:-117.7109,t:3,w:"https://www.hmc.edu/cs"},
+  {r:47,n:"Univ. of Virginia",c:"Charlottesville, VA",lat:38.0336,lng:-78.5080,t:3,w:"https://engineering.virginia.edu/departments/computer-science"},
+  {r:47,n:"Vanderbilt University",c:"Nashville, TN",lat:36.1447,lng:-86.8027,t:3,w:"https://www.cs.vanderbilt.edu"},
+  {r:49,n:"Worcester Polytechnic Inst.",c:"Worcester, MA",lat:42.2746,lng:-71.8063,t:3,w:"https://www.wpi.edu/academics/departments/computer-science"},
+  {r:50,n:"Univ. of Rochester",c:"Rochester, NY",lat:43.1285,lng:-77.6278,t:3,w:"https://www.cs.rochester.edu"},
+  {r:51,n:"Univ. of Pittsburgh",c:"Pittsburgh, PA",lat:40.4444,lng:-79.9608,t:4,w:"https://www.cs.pitt.edu"},
+  {r:51,n:"Tufts University",c:"Medford, MA",lat:42.4075,lng:-71.1190,t:4,w:"https://engineering.tufts.edu/cs"},
+  {r:53,n:"Univ. of Notre Dame",c:"Notre Dame, IN",lat:41.6996,lng:-86.2353,t:4,w:"https://cse.nd.edu"},
+  {r:53,n:"Univ. of Utah",c:"Salt Lake City, UT",lat:40.7649,lng:-111.8421,t:4,w:"https://www.cs.utah.edu"},
+  {r:55,n:"Washington Univ. in St. Louis",c:"St. Louis, MO",lat:38.6488,lng:-90.3108,t:4,w:"https://cse.wustl.edu"},
+  {r:55,n:"Rensselaer Polytechnic Inst.",c:"Troy, NY",lat:42.7298,lng:-73.6791,t:4,w:"https://www.cs.rpi.edu"},
+  {r:57,n:"UC Riverside",c:"Riverside, CA",lat:33.9537,lng:-117.3961,t:4,w:"https://www1.cs.ucr.edu"},
+  {r:57,n:"Iowa State University",c:"Ames, IA",lat:42.0267,lng:-93.6465,t:4,w:"https://www.cs.iastate.edu"},
+  {r:59,n:"UC Santa Cruz",c:"Santa Cruz, CA",lat:36.9916,lng:-122.0583,t:4,w:"https://engineering.ucsc.edu/departments/computer-science-and-engineering"},
+  {r:59,n:"Emory University",c:"Atlanta, GA",lat:33.7915,lng:-84.3239,t:4,w:"https://cs.emory.edu"},
+  {r:61,n:"SUNY–Albany",c:"Albany, NY",lat:42.6882,lng:-73.8271,t:4,w:"https://www.cs.albany.edu"},
+  {r:62,n:"Univ. of Illinois–Chicago",c:"Chicago, IL",lat:41.8720,lng:-87.6480,t:4,w:"https://cs.uic.edu"},
+  {r:62,n:"Texas A&M University",c:"College Station, TX",lat:30.6187,lng:-96.3365,t:4,w:"https://engineering.tamu.edu/cse"},
+  {r:64,n:"Case Western Reserve Univ.",c:"Cleveland, OH",lat:41.5042,lng:-81.6091,t:4,w:"https://engineering.case.edu/computer-and-data-sciences"},
+  {r:64,n:"George Mason University",c:"Fairfax, VA",lat:38.8316,lng:-77.3072,t:4,w:"https://cs.gmu.edu"},
+  {r:66,n:"Oregon State University",c:"Corvallis, OR",lat:44.5638,lng:-123.2794,t:4,w:"https://eecs.oregonstate.edu"},
+  {r:66,n:"Univ. of Tennessee",c:"Knoxville, TN",lat:35.9544,lng:-83.9259,t:4,w:"https://www.eecs.utk.edu"},
+  {r:68,n:"Univ. of Delaware",c:"Newark, DE",lat:39.6785,lng:-75.7516,t:4,w:"https://www.cis.udel.edu"},
+  {r:69,n:"William & Mary",c:"Williamsburg, VA",lat:37.2707,lng:-76.7075,t:4,w:"https://www.wm.edu/as/computerscience"},
+  {r:69,n:"Florida State University",c:"Tallahassee, FL",lat:30.4418,lng:-84.2985,t:4,w:"https://www.cs.fsu.edu"},
+  {r:71,n:"Drexel University",c:"Philadelphia, PA",lat:39.9564,lng:-75.1897,t:4,w:"https://drexel.edu/cci/academics/computer-science-department"},
+  {r:72,n:"George Washington Univ.",c:"Washington, DC",lat:38.8997,lng:-77.0489,t:4,w:"https://cs.gwu.edu"},
+  {r:73,n:"Univ. of Houston",c:"Houston, TX",lat:29.7199,lng:-95.3422,t:4,w:"https://www.uh.edu/nsm/computer-science"},
+  {r:74,n:"Univ. of Kansas",c:"Lawrence, KS",lat:38.9543,lng:-95.2558,t:4,w:"https://eecs.ku.edu"},
+  {r:75,n:"Clemson University",c:"Clemson, SC",lat:34.6834,lng:-82.8374,t:4,w:"https://www.clemson.edu/cecas/departments/computing"},
+  {r:76,n:"Colorado State University",c:"Fort Collins, CO",lat:40.5731,lng:-105.0849,t:4,w:"https://www.cs.colostate.edu"},
+  {r:77,n:"Univ. of Iowa",c:"Iowa City, IA",lat:41.6611,lng:-91.5302,t:4,w:"https://cs.uiowa.edu"},
+  {r:78,n:"Syracuse University",c:"Syracuse, NY",lat:43.0366,lng:-76.1378,t:4,w:"https://ecs.syracuse.edu/academics/electrical-engineering-and-computer-science"},
+  {r:79,n:"Lehigh University",c:"Bethlehem, PA",lat:40.6065,lng:-75.3776,t:4,w:"https://engineering.lehigh.edu/cse"},
+  {r:80,n:"Univ. of Nebraska–Lincoln",c:"Lincoln, NE",lat:40.8202,lng:-96.7005,t:4,w:"https://cse.unl.edu"},
+  {r:81,n:"Florida International Univ.",c:"Miami, FL",lat:25.7587,lng:-80.3728,t:4,w:"https://www.cis.fiu.edu"},
+  {r:82,n:"Univ. of South Carolina",c:"Columbia, SC",lat:33.9966,lng:-81.0299,t:4,w:"https://www.cse.sc.edu"},
+  {r:83,n:"Washington State University",c:"Pullman, WA",lat:46.7298,lng:-117.1817,t:4,w:"https://school.eecs.wsu.edu"},
+  {r:84,n:"Illinois Inst. of Technology",c:"Chicago, IL",lat:41.8355,lng:-87.6270,t:4,w:"https://www.iit.edu/computer-science"},
+  {r:85,n:"UMBC",c:"Baltimore, MD",lat:39.2561,lng:-76.7143,t:4,w:"https://www.csee.umbc.edu"},
+  {r:86,n:"Wayne State University",c:"Detroit, MI",lat:42.3573,lng:-83.0714,t:4,w:"https://engineering.wayne.edu/computer-science"},
+  {r:87,n:"Univ. of Central Florida",c:"Orlando, FL",lat:28.6024,lng:-81.2001,t:4,w:"https://www.cs.ucf.edu"},
+  {r:88,n:"Stevens Inst. of Technology",c:"Hoboken, NJ",lat:40.7440,lng:-74.0242,t:4,w:"https://www.stevens.edu/school-engineering-science/departments/computer-science"},
+  {r:89,n:"Missouri S&T",c:"Rolla, MO",lat:37.9519,lng:-91.7785,t:4,w:"https://cs.mst.edu"},
+  {r:90,n:"Univ. of Kentucky",c:"Lexington, KY",lat:38.0306,lng:-84.4985,t:4,w:"https://www.engr.uky.edu/research-faculty/departments/computer-science"},
+  {r:91,n:"Univ. of South Florida",c:"Tampa, FL",lat:28.0587,lng:-82.4139,t:4,w:"https://www.usf.edu/engineering/cse"},
+  {r:92,n:"CUNY Graduate Center",c:"New York, NY",lat:40.7484,lng:-73.9842,t:4,w:"https://www.gc.cuny.edu/computer-science"},
+  {r:93,n:"Univ. of Alabama",c:"Tuscaloosa, AL",lat:33.2098,lng:-87.5692,t:4,w:"https://cs.ua.edu"},
+  {r:94,n:"Binghamton Univ. (SUNY)",c:"Binghamton, NY",lat:42.0898,lng:-75.9679,t:4,w:"https://www.binghamton.edu/computer-science"},
+  {r:95,n:"Oklahoma State University",c:"Stillwater, OK",lat:36.1269,lng:-97.0737,t:4,w:"https://cs.okstate.edu"},
+  {r:96,n:"New Mexico State University",c:"Las Cruces, NM",lat:32.2801,lng:-106.7497,t:4,w:"https://cs.nmsu.edu"},
+  {r:97,n:"Univ. of Arkansas",c:"Fayetteville, AR",lat:36.0679,lng:-94.1741,t:4,w:"https://engineering.uark.edu/computer-science-computer-engineering"},
+  {r:98,n:"Univ. of Connecticut",c:"Storrs, CT",lat:41.8077,lng:-72.2535,t:4,w:"https://www.cse.uconn.edu"},
+  {r:99,n:"Univ. of Mississippi",c:"Oxford, MS",lat:34.3654,lng:-89.5378,t:4,w:"https://engineering.olemiss.edu/eecs"},
+  {r:100,n:"Portland State University",c:"Portland, OR",lat:45.5118,lng:-122.6844,t:4,w:"https://www.pdx.edu/computer-science"},
 ];
 
-let map, gmarkers=[], openIW=null;
-const mob = ()=>window.innerWidth<=768;
+let map, GM=[], openIW=null;
+const mob=()=>window.innerWidth<=768;
 
-// ── Google Maps ──
-window.initMap = function(){
-  map = new google.maps.Map(document.getElementById('map'),{
-    center:{lat:39.5,lng:-98.0}, zoom: mob()?3:4,
+window.initMap=function(){
+  map=new google.maps.Map(document.getElementById('map'),{
+    center:{lat:39.5,lng:-98.0}, zoom:mob()?3:4,
     mapTypeId:'roadmap', gestureHandling:'greedy',
     disableDefaultUI:false, zoomControl:true,
-    mapTypeControl:false, streetViewControl:false, fullscreenControl:!mob(),
+    mapTypeControl:false, streetViewControl:false, fullscreenControl:false,
     styles:[
       {elementType:'geometry',stylers:[{color:'#1a2235'}]},
       {elementType:'labels.text.fill',stylers:[{color:'#8a9bc0'}]},
@@ -477,162 +428,153 @@ window.initMap = function(){
   });
 
   SCHOOLS.forEach(s=>{
-    const sz = s.t===1?36:s.t===2?30:s.t===3?26:22;
-    const fs = s.t===1?11:s.t===2?9:8;
-    const m = new google.maps.Marker({
-      position:{lat:s.lat,lng:s.lng}, map,
+    const sz=s.t===1?36:s.t===2?30:s.t===3?26:22;
+    const fs=s.t===1?11:s.t===2?9:8;
+    const m=new google.maps.Marker({
+      position:{lat:s.lat,lng:s.lng},map,
       icon:{path:google.maps.SymbolPath.CIRCLE,fillColor:TC[s.t],fillOpacity:1,strokeColor:'rgba(255,255,255,0.3)',strokeWeight:1.5,scale:sz/2},
       title:s.n,
-      label:{text:String(s.r),color:TTX[s.t],fontFamily:"'Space Mono',monospace",fontSize:`${fs}px`,fontWeight:'700'},
+      label:{text:String(s.r),color:TX[s.t],fontFamily:"'Space Mono',monospace",fontSize:`${fs}px`,fontWeight:'700'},
       zIndex:(5-s.t)*100,
     });
     const mu=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.n+' '+s.c)}`;
     const iw=new google.maps.InfoWindow({maxWidth:300,content:`
       <div class="iw">
-        <div class="iw-r" style="color:${TC[s.t]}">#${s.r} · ${TL[s.t]}</div>
-        <div class="iw-n">${s.n}</div>
-        <div class="iw-c">📍 ${s.c}</div>
-        <hr class="iw-hr">
-        <div class="iw-btns">
-          <a class="iw-btn iw-bm" href="${mu}" target="_blank" rel="noopener">
+        <div class="iwr" style="color:${TC[s.t]}">#${s.r} · ${TL[s.t]}</div>
+        <div class="iwn">${s.n}</div>
+        <div class="iwc">📍 ${s.c}</div>
+        <hr class="iwhr">
+        <div class="iwbtns">
+          <a class="iwb iwbm" href="${mu}" target="_blank" rel="noopener">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
             Google Maps
           </a>
-          <a class="iw-btn iw-bw" href="${s.w}" target="_blank" rel="noopener">
+          <a class="iwb iwbw" href="${s.w}" target="_blank" rel="noopener">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
             Official Site
           </a>
         </div>
       </div>`
     });
-    m.addListener('click',()=>{
-      if(openIW) openIW.close();
-      iw.open(map,m);
-      openIW=iw;
-    });
-    gmarkers.push({m,iw,s});
+    m.addListener('click',()=>{ if(openIW)openIW.close(); iw.open(map,m); openIW=iw; });
+    GM.push({m,iw,s});
   });
   map.addListener('click',()=>{ if(openIW){openIW.close();openIW=null;} });
+
+  // After map loads, trigger resize so it fills container correctly
+  google.maps.event.trigger(map,'resize');
+  if(mob()) setTimeout(()=>google.maps.event.trigger(map,'resize'), 300);
 };
 
-// ── Card HTML ──
+// Card HTML
 function cardHTML(s){
   const mu=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.n+' '+s.c)}`;
   return `<div class="rnk" style="background:${TC[s.t]}22;color:${TC[s.t]}">#${s.r}</div>
     <div style="flex:1;min-width:0">
       <div class="sname">${s.n}</div>
       <div class="scity">${s.c}</div>
-      <div class="card-links">
-        <a class="cl cl-map" href="${mu}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📍 Maps</a>
-        <a class="cl cl-web" href="${s.w}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🌐 Website</a>
+      <div class="clinks">
+        <a class="cl cl-m" href="${mu}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📍 Maps</a>
+        <a class="cl cl-w" href="${s.w}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🌐 Website</a>
       </div>
     </div>`;
 }
 
 function flyTo(s){
-  if(!map) return;
-  map.panTo({lat:s.lat,lng:s.lng});
-  map.setZoom(mob()?9:10);
-  const e=gmarkers.find(x=>x.s===s);
-  if(e){ if(openIW) openIW.close(); e.iw.open(map,e.m); openIW=e.iw; }
+  if(!map)return;
+  if(mob()){setTab('map');}
+  setTimeout(()=>{
+    map.panTo({lat:s.lat,lng:s.lng});
+    map.setZoom(mob()?9:10);
+    const e=GM.find(x=>x.s===s);
+    if(e){if(openIW)openIW.close();e.iw.open(map,e.m);openIW=e.iw;}
+    google.maps.event.trigger(map,'resize');
+  }, mob()?150:0);
 }
 
-function matchQ(s,q){
-  const lq=q.toLowerCase();
-  return s.n.toLowerCase().includes(lq)||s.c.toLowerCase().includes(lq);
-}
+function mq(s,q){if(!q)return true;const l=q.toLowerCase();return s.n.toLowerCase().includes(l)||s.c.toLowerCase().includes(l);}
 
-// ── Render list into any container ──
-function renderInto(elId, q, onCardClick){
+function renderTo(elId,q,onClick){
   const el=document.getElementById(elId);
   el.innerHTML='';
   [1,2,3,4].forEach(t=>{
-    if(!tierVis[t]) return;
-    const rows=SCHOOLS.filter(s=>s.t===t&&(q===''||matchQ(s,q)));
-    if(!rows.length) return;
+    if(!TV[t])return;
+    const rows=SCHOOLS.filter(s=>s.t===t&&mq(s,q));
+    if(!rows.length)return;
     const h=document.createElement('div');
-    h.className='tier-hdr';
-    h.innerHTML=`<div class="tier-dot" style="background:${TC[t]}"></div>${TL[t]}`;
+    h.className='thdr';
+    h.innerHTML=`<div class="tdot" style="background:${TC[t]}"></div>${TL[t]}`;
     el.appendChild(h);
     rows.forEach(s=>{
       const d=document.createElement('div');
       d.className=`scard t${s.t}`;
       d.innerHTML=cardHTML(s);
-      d.addEventListener('click',()=>{
-        el.querySelectorAll('.scard').forEach(x=>x.classList.remove('sel'));
-        d.classList.add('sel');
-        onCardClick(s);
-      });
+      d.addEventListener('click',()=>{el.querySelectorAll('.scard').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');onClick(s);});
       el.appendChild(d);
     });
   });
 }
 
-// Initial render
-renderInto('schoolList','',s=>flyTo(s));
-renderInto('listViewList','',s=>{ setTab('map'); setTimeout(()=>flyTo(s),80); });
-renderInto('sheetList','',s=>{ closeSheet(); setTab('map'); setTimeout(()=>flyTo(s),80); });
+// Initial render all lists
+renderTo('deskList','',s=>flyTo(s));
+renderTo('listViewList','',s=>flyTo(s));
+renderTo('bsheetList','',s=>{ closeSheet(); flyTo(s); });
 
-document.getElementById('searchDesk').addEventListener('input',e=>renderInto('schoolList',e.target.value,s=>flyTo(s)));
-document.getElementById('searchList').addEventListener('input',e=>renderInto('listViewList',e.target.value,s=>{ setTab('map'); setTimeout(()=>flyTo(s),80); }));
-document.getElementById('searchSheet').addEventListener('input',e=>renderInto('sheetList',e.target.value,s=>{ closeSheet(); setTab('map'); setTimeout(()=>flyTo(s),80); }));
+// Search inputs
+document.getElementById('deskSearch').addEventListener('input',e=>renderTo('deskList',e.target.value,s=>flyTo(s)));
+document.getElementById('listSearch').addEventListener('input',e=>renderTo('listViewList',e.target.value,s=>flyTo(s)));
+document.getElementById('sheetSearch').addEventListener('input',e=>renderTo('bsheetList',e.target.value,s=>{closeSheet();flyTo(s);}));
 
-// ── Tier filter ──
-function applyFilter(t){
-  tierVis[t]=!tierVis[t];
-  document.querySelectorAll(`.leg[data-tier="${t}"]`).forEach(el=>{
-    el.classList.toggle('on',tierVis[t]);
-    el.classList.toggle('off',!tierVis[t]);
-  });
-  gmarkers.filter(x=>x.s.t===t).forEach(x=>x.m.setMap(tierVis[t]?map:null));
-  renderInto('schoolList',document.getElementById('searchDesk').value,s=>flyTo(s));
-  renderInto('listViewList',document.getElementById('searchList').value,s=>{ setTab('map'); setTimeout(()=>flyTo(s),80); });
-  renderInto('sheetList',document.getElementById('searchSheet').value,s=>{ closeSheet(); setTab('map'); setTimeout(()=>flyTo(s),80); });
+// Tier filter
+function applyTier(t){
+  TV[t]=!TV[t];
+  document.querySelectorAll(`.leg[data-tier="${t}"]`).forEach(el=>{el.classList.toggle('on',TV[t]);el.classList.toggle('off',!TV[t]);});
+  GM.filter(x=>x.s.t===t).forEach(x=>x.m.setMap(TV[t]?map:null));
+  renderTo('deskList',document.getElementById('deskSearch').value,s=>flyTo(s));
+  renderTo('listViewList',document.getElementById('listSearch').value,s=>flyTo(s));
+  renderTo('bsheetList',document.getElementById('sheetSearch').value,s=>{closeSheet();flyTo(s);});
 }
-document.querySelectorAll('.leg').forEach(el=>el.addEventListener('click',()=>applyFilter(+el.dataset.tier)));
+document.querySelectorAll('.leg').forEach(el=>el.addEventListener('click',()=>applyTier(+el.dataset.tier)));
 
-// ── Mobile filter panel ──
-const fp=document.getElementById('filterPanel');
-document.getElementById('filterBtn').addEventListener('click',e=>{ e.stopPropagation(); fp.classList.toggle('open'); });
-document.addEventListener('click',e=>{ if(!fp.contains(e.target)&&e.target!==document.getElementById('filterBtn')) fp.classList.remove('open'); });
+// Mobile filter panel
+const fp=document.getElementById('filtPanel');
+document.getElementById('filtBtn').addEventListener('click',e=>{e.stopPropagation();fp.classList.toggle('act');});
+document.addEventListener('click',e=>{if(!fp.contains(e.target)&&e.target.id!=='filtBtn')fp.classList.remove('act');});
 
-// ── Bottom sheet ──
-function openSheet(){ document.getElementById('bottomSheet').classList.add('open'); }
-function closeSheet(){ document.getElementById('bottomSheet').classList.remove('open'); }
-document.getElementById('sheetClose').addEventListener('click',closeSheet);
-
+// Bottom sheet
+function openSheet(){document.getElementById('bsheet').classList.add('act');}
+function closeSheet(){document.getElementById('bsheet').classList.remove('act');}
+document.getElementById('bshClose').addEventListener('click',closeSheet);
+const bs=document.getElementById('bsheet');
 let sy=0;
-const bs=document.getElementById('bottomSheet');
 bs.addEventListener('touchstart',e=>{sy=e.touches[0].clientY;},{passive:true});
-bs.addEventListener('touchmove',e=>{const dy=e.touches[0].clientY-sy; if(dy>0) bs.style.transform=`translateY(${dy}px)`;},{passive:true});
-bs.addEventListener('touchend',e=>{ const dy=e.changedTouches[0].clientY-sy; bs.style.transform=''; if(dy>80) closeSheet(); });
+bs.addEventListener('touchmove',e=>{const dy=e.touches[0].clientY-sy;if(dy>0)bs.style.transform=`translateY(${dy}px)`;},{passive:true});
+bs.addEventListener('touchend',e=>{const dy=e.changedTouches[0].clientY-sy;bs.style.transform='';if(dy>80)closeSheet();});
 
-// ── Tab bar ──
+// Tab bar
 function setTab(tab){
-  ['tabMap','tabList','tabSearch'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  ['tabMap','tabList','tabSearch'].forEach(id=>document.getElementById(id).classList.remove('act'));
   const lv=document.getElementById('listView');
   if(tab==='map'){
-    document.getElementById('tabMap').classList.add('active');
-    lv.classList.remove('active');
+    document.getElementById('tabMap').classList.add('act');
+    lv.classList.remove('act');
     closeSheet();
+    if(map) setTimeout(()=>google.maps.event.trigger(map,'resize'),50);
   } else if(tab==='list'){
-    document.getElementById('tabList').classList.add('active');
-    lv.classList.add('active');
+    document.getElementById('tabList').classList.add('act');
+    lv.classList.add('act');
     closeSheet();
   } else {
-    document.getElementById('tabSearch').classList.add('active');
-    lv.classList.remove('active');
+    document.getElementById('tabSearch').classList.add('act');
+    lv.classList.remove('act');
     openSheet();
-    setTimeout(()=>document.getElementById('searchSheet').focus(),350);
+    setTimeout(()=>document.getElementById('sheetSearch').focus(),350);
   }
 }
 document.getElementById('tabMap').addEventListener('click',()=>setTab('map'));
 document.getElementById('tabList').addEventListener('click',()=>setTab('list'));
 document.getElementById('tabSearch').addEventListener('click',()=>setTab('search'));
 </script>
-
-<script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8AsjvG1dzVBfSpb7vlRIiNWTeQRI2xyU&callback=initMap&language=en">
-</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8AsjvG1dzVBfSpb7vlRIiNWTeQRI2xyU&callback=initMap&language=en"></script>
 </body>
 </html>
